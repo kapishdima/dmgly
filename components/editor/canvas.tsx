@@ -9,7 +9,6 @@ import {
   Remove01Icon,
   Add01Icon,
   Maximize01Icon,
-  PackageIcon,
   Cursor01Icon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
@@ -221,19 +220,13 @@ export function DmgCanvas({
                 {item(
                   "app",
                   <>
-                    <span className="app-placeholder">
-                      {d.app.image ? (
-                        <img
-                          src={d.app.image.data}
-                          alt=""
-                          width={128}
-                          height={128}
-                          draggable={false}
-                        />
-                      ) : (
-                        <Icon icon={PackageIcon} size={54} />
-                      )}
-                    </span>
+                    <img
+                      src={d.app.image?.data ?? "/assets/generic-application.png"}
+                      alt=""
+                      width={128}
+                      height={128}
+                      draggable={false}
+                    />
                     <span className="icon-label">{d.app.name}</span>
                   </>,
                   "App icon",

@@ -10,6 +10,10 @@ The preview uses Apple's Applications folder artwork, obtained from the [DocSyst
 
 Other interface icons use the existing Hugeicons package. Editable installation arrows remain document artwork.
 
+## Default application icon
+
+`public/assets/generic-application.png` is the macOS generic application artwork, rendered at 256 px via `NSWorkspace.shared.icon(forFile:)` from the iconless test fixture used for native DMG verification on this host. It appears at 128 logical pixels until the user uploads an icon. The older `CoreTypes.bundle/GenericApplicationIcon.icns` differs from Finder's current resolved icon, so that legacy asset is not used. Apple retains rights to its system artwork. This image is preview-only; real DMGs get their icon from the built app.
+
 ## Export and validation
 
 The export dialog uses Base UI Select with keyboard navigation and a stable code viewport. Shiki 4.4.3 is loaded on demand with only JSON, Bash, Markdown, and one light theme. Its JavaScript regex engine avoids a separate WASM request. The AI prompt wraps at the viewport edge; configuration keeps its code indentation. Copying still uses the original text, independent of highlighting.
