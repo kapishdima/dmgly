@@ -535,6 +535,10 @@
 .dmgly .dialkit-root [class*="value"] {
   font-variant-numeric: tabular-nums;
 }
+.dialkit-select-dropdown .dialkit-select-option {
+  border-radius: max(0px, calc(var(--dial-radius) - 5px));
+  padding-inline: 12px;
+}
 .segment {
   display: flex;
   gap: 3px;
