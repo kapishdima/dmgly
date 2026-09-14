@@ -14,9 +14,17 @@ import {
 import { Icon } from "./icon";
 import { textBounds } from "@/lib/dmgly/artwork";
 import {
-  canTransform, elementFrame, moveSelection, rotatePoint, rotateSelection,
-  scaleSelection, selectElement, selectionFrame, visibleElements,
-  type Point, type SelectionFrame,
+  canTransform,
+  elementFrame,
+  moveSelection,
+  rotatePoint,
+  rotateSelection,
+  scaleSelection,
+  selectElement,
+  selectionFrame,
+  visibleElements,
+  type Point,
+  type SelectionFrame,
 } from "@/lib/dmgly/transforms";
 import { SelectionHandles } from "./selection-handles";
 
@@ -57,7 +65,9 @@ export function DmgCanvas({
   const artboard = useRef<HTMLDivElement>(null);
   const drag = useRef<Gesture | null>(null);
   const keyboardMove = useRef(false);
-  const [transformFrame, setTransformFrame] = useState<SelectionFrame | null>(null);
+  const [transformFrame, setTransformFrame] = useState<SelectionFrame | null>(
+    null,
+  );
   const [textFrame, setTextFrame] = useState<SelectionFrame | null>(null);
   const ids = visibleElements(d).filter((id) => selected.includes(id));
   const frame = transformFrame ?? selectionFrame(d, ids, textFrame);
@@ -73,11 +83,21 @@ export function DmgCanvas({
     return () => observer.disconnect();
   }, []);
   useLayoutEffect(() => {
-    const text = artboard.current?.querySelector<SVGTextElement>(".artwork text");
+    const text =
+      artboard.current?.querySelector<SVGTextElement>(".artwork text");
     if (!text) return;
     const box = text.getBBox();
-    const center = rotatePoint({ x: box.x + box.width / 2, y: box.y + box.height / 2 }, d.text, d.text.rotation);
-    setTextFrame({ ...center, width: Math.max(16, box.width), height: Math.max(24, box.height), rotation: d.text.rotation });
+    const center = rotatePoint(
+      { x: box.x + box.width / 2, y: box.y + box.height / 2 },
+      d.text,
+      d.text.rotation,
+    );
+    setTextFrame({
+      ...center,
+      width: Math.max(16, box.width),
+      height: Math.max(24, box.height),
+      rotation: d.text.rotation,
+    });
   }, [d.text]);
   const canvasPadding = available < 500 ? 24 : 48;
   const scale =
@@ -87,9 +107,17 @@ export function DmgCanvas({
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       const target = e.target;
-      if (!(target instanceof HTMLElement) || target.closest('input,textarea,[contenteditable]:not([contenteditable="false"]),[role="dialog"],.export-dialog')) return;
+      if (window.document.querySelector(".export-dialog")) return;
+      if (
+        !(target instanceof HTMLElement) ||
+        target.closest(
+          'input,textarea,[contenteditable]:not([contenteditable="false"]),[role="dialog"],.export-dialog',
+        )
+      )
+        return;
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
         e.preventDefault();
+        if (drag.current) return;
         onSelectionChange(visibleElements(d));
         host.current?.focus({ preventScroll: true });
       }
@@ -100,10 +128,14 @@ export function DmgCanvas({
 
   function pointer(e: React.PointerEvent): Point {
     const rect = artboard.current!.getBoundingClientRect();
-    return { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
+    return {
+      x: (e.clientX - rect.left) / scale,
+      y: (e.clientY - rect.top) / scale,
+    };
   }
   function snap(id: MovableId, moving: MovableId[], x: number, y: number) {
-    const xs = [d.window.width / 2], ys = [(d.window.height - TITLEBAR_HEIGHT) / 2];
+    const xs = [d.window.width / 2],
+      ys = [(d.window.height - TITLEBAR_HEIGHT) / 2];
     for (const other of visibleElements(d)) {
       if (other !== id && !moving.includes(other)) {
         xs.push(d[other].x);
@@ -129,32 +161,85 @@ export function DmgCanvas({
     if (!start) return;
     const point = pointer(e);
     if (start.kind === "move") {
-      const id = start.ids[0], origin = start.document[id];
-      const destination = snap(id, start.ids, origin.x + point.x - start.pointer.x, origin.y + point.y - start.pointer.y);
-      onChange(moveSelection(start.document, start.ids, destination.x - origin.x, destination.y - origin.y));
+      const id = start.ids[0],
+        origin = start.document[id];
+      const destination = snap(
+        id,
+        start.ids,
+        origin.x + point.x - start.pointer.x,
+        origin.y + point.y - start.pointer.y,
+      );
+      onChange(
+        moveSelection(
+          start.document,
+          start.ids,
+          destination.x - origin.x,
+          destination.y - origin.y,
+        ),
+      );
     } else if (start.kind === "rotate") {
-      const angle = (Math.atan2(point.y - start.center.y, point.x - start.center.x)
-        - Math.atan2(start.pointer.y - start.center.y, start.pointer.x - start.center.x)) * 180 / Math.PI;
-      const degrees = e.shiftKey ? Math.round((start.frame.rotation + angle) / 15) * 15 - start.frame.rotation : angle;
-      const next = rotateSelection(start.document, start.ids, start.center, degrees);
+      const angle =
+        ((Math.atan2(point.y - start.center.y, point.x - start.center.x) -
+          Math.atan2(
+            start.pointer.y - start.center.y,
+            start.pointer.x - start.center.x,
+          )) *
+          180) /
+        Math.PI;
+      const degrees = e.shiftKey
+        ? Math.round((start.frame.rotation + angle) / 15) * 15 -
+          start.frame.rotation
+        : angle;
+      const next = rotateSelection(
+        start.document,
+        start.ids,
+        start.center,
+        degrees,
+      );
       if (next === start.document && degrees !== 0) return;
       onChange(next);
-      setTransformFrame({ ...start.frame, rotation: start.frame.rotation + (next === start.document ? 0 : degrees) });
+      setTransformFrame({
+        ...start.frame,
+        rotation:
+          start.frame.rotation + (next === start.document ? 0 : degrees),
+      });
     } else {
-      const vx = start.pointer.x - start.anchor.x, vy = start.pointer.y - start.anchor.y;
-      const factor = ((point.x - start.anchor.x) * vx + (point.y - start.anchor.y) * vy) / (vx * vx + vy * vy);
+      const vx = start.pointer.x - start.anchor.x,
+        vy = start.pointer.y - start.anchor.y;
+      const factor =
+        ((point.x - start.anchor.x) * vx + (point.y - start.anchor.y) * vy) /
+        (vx * vx + vy * vy);
       onChange(scaleSelection(start.document, start.ids, start.anchor, factor));
     }
   }
-  function beginTransform(e: React.PointerEvent<HTMLButtonElement>, kind: "rotate" | "scale", corner: Point) {
+  function beginTransform(
+    e: React.PointerEvent<HTMLButtonElement>,
+    kind: "rotate" | "scale",
+    corner: Point,
+  ) {
     if (e.button !== 0 || !frame || !canTransform(ids)) return;
     e.preventDefault();
     e.stopPropagation();
     e.currentTarget.focus({ preventScroll: true });
     e.currentTarget.setPointerCapture(e.pointerId);
     onBegin?.();
-    const anchor = rotatePoint({ x: frame.x - corner.x * frame.width / 2, y: frame.y - corner.y * frame.height / 2 }, frame, frame.rotation);
-    drag.current = { kind, document: d, ids, pointer: pointer(e), center: frame, anchor, frame };
+    const anchor = rotatePoint(
+      {
+        x: frame.x - (corner.x * frame.width) / 2,
+        y: frame.y - (corner.y * frame.height) / 2,
+      },
+      frame,
+      frame.rotation,
+    );
+    drag.current = {
+      kind,
+      document: d,
+      ids,
+      pointer: pointer(e),
+      center: frame,
+      anchor,
+      frame,
+    };
   }
   function keyboard(e: React.KeyboardEvent) {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") finish();
@@ -165,17 +250,32 @@ export function DmgCanvas({
       host.current?.focus({ preventScroll: true });
       return;
     }
-    if (e.target instanceof HTMLElement && e.target.closest(".transform-handle")) return;
-    const offsets: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+    if (
+      e.target instanceof HTMLElement &&
+      e.target.closest(".transform-handle")
+    )
+      return;
+    const offsets: Record<string, [number, number]> = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1],
+    };
     const offset = offsets[e.key];
     if (!offset || !ids.length || e.metaKey || e.ctrlKey || e.altKey) return;
     e.preventDefault();
-    if (!keyboardMove.current) { onBegin?.(); keyboardMove.current = true; }
+    if (!keyboardMove.current) {
+      onBegin?.();
+      keyboardMove.current = true;
+    }
     const step = e.shiftKey ? 10 : 1;
     onChange(moveSelection(d, ids, offset[0] * step, offset[1] * step));
   }
   function finishKeyboard() {
-    if (keyboardMove.current) { keyboardMove.current = false; onEnd?.(); }
+    if (keyboardMove.current) {
+      keyboardMove.current = false;
+      onEnd?.();
+    }
   }
   function item(
     id: MovableId,
@@ -198,20 +298,35 @@ export function DmgCanvas({
         }}
         onClick={(e) => {
           e.stopPropagation();
-          if (e.detail === 0) onSelectionChange(selectElement(selected, id, e.shiftKey));
+          if (e.detail === 0)
+            onSelectionChange(selectElement(selected, id, e.shiftKey));
         }}
         onPointerDown={(e) => {
           if (e.button !== 0) return;
           e.stopPropagation();
           e.preventDefault();
           e.currentTarget.focus({ preventScroll: true });
-          const selection = e.shiftKey ? selectElement(selected, id, true) : selected.includes(id) ? selected : [id];
+          const selection = e.shiftKey
+            ? selectElement(selected, id, true)
+            : selected.includes(id)
+              ? selected
+              : [id];
           onSelectionChange(selection);
-          const moving = visibleElements(d).filter((item) => selection.includes(item));
+          const moving = visibleElements(d).filter((item) =>
+            selection.includes(item),
+          );
           if (!moving.includes(id)) return;
           onBegin?.();
           const bounds = selectionFrame(d, moving, textFrame)!;
-          drag.current = { kind: "move", ids: moving, document: d, pointer: pointer(e), center: bounds, anchor: bounds, frame: bounds };
+          drag.current = {
+            kind: "move",
+            ids: moving,
+            document: d,
+            pointer: pointer(e),
+            center: bounds,
+            anchor: bounds,
+            frame: bounds,
+          };
           e.currentTarget.setPointerCapture(e.pointerId);
         }}
         onPointerMove={updateGesture}
@@ -225,8 +340,17 @@ export function DmgCanvas({
   }
   return (
     <>
-      <div ref={host} className="canvas-host" tabIndex={0} role="group" aria-label="Preview canvas" aria-keyshortcuts="Meta+A Control+A"
-        onKeyDown={keyboard} onKeyUp={finishKeyboard} onBlur={finishKeyboard}>
+      <div
+        ref={host}
+        className="canvas-host"
+        tabIndex={0}
+        role="group"
+        aria-label="Preview canvas"
+        aria-keyshortcuts="Meta+A Control+A"
+        onKeyDown={keyboard}
+        onKeyUp={finishKeyboard}
+        onBlur={finishKeyboard}
+      >
         <div className="canvas-scroll" style={{ padding: canvasPadding }}>
           <div
             className="canvas-size"
@@ -287,7 +411,9 @@ export function DmgCanvas({
                   "app",
                   <>
                     <img
-                      src={d.app.image?.data ?? "/assets/generic-application.png"}
+                      src={
+                        d.app.image?.data ?? "/assets/generic-application.png"
+                      }
                       alt=""
                       width={128}
                       height={128}
@@ -338,13 +464,25 @@ export function DmgCanvas({
                     />,
                     "Installation arrow",
                   )}
-                {frame && <SelectionHandles
-                  frame={frame} zoom={scale} count={ids.length} transformable={canTransform(ids)}
-                  onBegin={beginTransform} onMove={updateGesture} onEnd={() => finish()} onCancel={() => finish(true)}
-                  onKeyTransform={(kind, amount) => {
-                    onChange(kind === "rotate" ? rotateSelection(d, ids, frame, amount) : scaleSelection(d, ids, frame, amount));
-                  }}
-                />}
+                {frame && (
+                  <SelectionHandles
+                    frame={frame}
+                    zoom={scale}
+                    count={ids.length}
+                    transformable={canTransform(ids)}
+                    onBegin={beginTransform}
+                    onMove={updateGesture}
+                    onEnd={() => finish()}
+                    onCancel={() => finish(true)}
+                    onKeyTransform={(kind, amount) => {
+                      onChange(
+                        kind === "rotate"
+                          ? rotateSelection(d, ids, frame, amount)
+                          : scaleSelection(d, ids, frame, amount),
+                      );
+                    }}
+                  />
+                )}
                 {guides.x !== undefined && (
                   <div className="guide guide-x" style={{ left: guides.x }} />
                 )}
@@ -363,9 +501,13 @@ export function DmgCanvas({
         </span>
         <p className="preview-note">
           <Icon icon={Cursor01Icon} size={16} />
-          <span aria-live="polite">{ids.length > 1 ? `${ids.length} selected. Drag to move together.` : canTransform(ids)
-            ? "Drag corners to scale. Drag outside corners to rotate."
-            : "Shift-click to select more. ⌘A to select all."}</span>
+          <span aria-live="polite">
+            {ids.length > 1
+              ? `${ids.length} selected. Drag to move together.`
+              : canTransform(ids)
+                ? "Drag corners to scale. Drag outside corners to rotate."
+                : "Shift-click to select more. ⌘A to select all."}
+          </span>
         </p>
         <div className="zoom-controls">
           <button

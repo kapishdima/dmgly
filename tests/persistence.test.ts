@@ -12,6 +12,8 @@ test("a draft round-trips with uploaded assets and hidden layer settings", async
   const design = createComposition();
   design.text.visible = false;
   design.text.content = "Install → Café";
+  design.text.rotation = 25;
+  design.arrow.scale = 1.5;
   design.app.image = {
     name: "icon.png",
     width: 1,
