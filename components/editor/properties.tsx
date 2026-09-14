@@ -2,7 +2,7 @@
 import { ColorControl, SelectControl, Slider, Toggle, TextControl } from "dialkit";
 import "dialkit/styles.css";
 import { AssetUpload } from "./asset-upload";
-import { Composition } from "@/lib/dmgly/model";
+import { Composition, ElementId, moveElement, resizeWindow } from "@/lib/dmgly/model";
 
 export function hexColor(value: string): string {
   const c=document.createElement("canvas").getContext("2d")!;
@@ -54,4 +54,21 @@ export function DecorationProperties({document:d,id,onChange}:{document:Composit
    <Slider label="Rotation" value={a.rotation} min={-180} max={180} step={1} unit="°" onChange={rotation=>onChange({...d,arrow:{...a,rotation}})}/>
   </>}
  </div>;
+}
+
+export function Inspector({document:d,selected,onSelect,onChange,onBegin,onEnd,children}:{document:Composition;selected:ElementId;onSelect:(id:ElementId)=>void;onChange:(d:Composition)=>void;onBegin?:()=>void;onEnd?:()=>void;children?:React.ReactNode}){
+ const labels={background:"Background",app:"App",applications:"Folder",text:"Text",arrow:"Arrow"};
+ const native=selected==="app"||selected==="applications";
+ return <aside className="inspector">
+  <div className="inspector-heading"><h2>Make it yours</h2><span>A few details. All the difference.</span></div>
+  <div className="element-tabs" aria-label="Select element">{(Object.keys(labels) as ElementId[]).map(id=><button key={id} className={selected===id?"active":""} aria-pressed={selected===id} onClick={()=>onSelect(id)}>{labels[id]}</button>)}</div>
+  <div className="property-scroll" onPointerDownCapture={onBegin} onPointerUpCapture={onEnd} onPointerCancelCapture={onEnd} onFocusCapture={onBegin} onBlurCapture={onEnd}>
+   {selected==="background"&&<BackgroundProperties document={d} onChange={onChange}/>}
+   {selected==="app"&&<div className="dialkit-root control-stack" data-theme="light"><TextControl label="App name" value={d.app.name} onChange={name=>onChange({...d,app:{...d.app,name:name.slice(0,80)}})}/><AssetUpload label="Upload app icon" value={d.app.image} onChange={image=>onChange({...d,app:{...d.app,image}})}/><p className="control-note">Use the same icon as your built app.</p></div>}
+   {(selected==="text"||selected==="arrow")&&<DecorationProperties document={d} id={selected} onChange={onChange}/>}
+   {selected!=="background"&&<div className="dialkit-root control-stack position-controls" data-theme="light"><p className="field-label">POSITION</p><Slider label="X" value={d[selected].x} min={native?72:16} max={d.window.width-(native?72:16)} step={1} onChange={x=>onChange(moveElement(d,selected,x,d[selected].y))}/><Slider label="Y" value={d[selected].y} min={native?72:16} max={d.window.height-28-(native?96:16)} step={1} onChange={y=>onChange(moveElement(d,selected,d[selected].x,y))}/>{native&&<p className="control-note">Icon size: 128 px · Matches all export formats.</p>}</div>}
+   <details className="window-details"><summary>Window size <span>{d.window.width} × {d.window.height}</span></summary><div className="dialkit-root control-stack" data-theme="light"><Slider label="Width" value={d.window.width} min={480} max={1200} step={1} onChange={width=>onChange(resizeWindow(d,width,d.window.height))}/><Slider label="Height" value={d.window.height} min={320} max={900} step={1} onChange={height=>onChange(resizeWindow(d,d.window.width,height))}/></div></details>
+  </div>
+  {children}
+ </aside>;
 }
