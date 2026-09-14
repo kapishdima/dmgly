@@ -80,6 +80,13 @@
   gap: 16px;
   padding-bottom: 36px;
 }
+.intro-brand {
+  align-self: flex-start;
+  margin-bottom: 8px;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
 .intro h1 {
   max-width: 20ch;
   font-size: clamp(2rem, 1.5rem + 2vw, 3rem);

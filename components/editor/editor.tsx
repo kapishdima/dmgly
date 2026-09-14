@@ -34,6 +34,7 @@ export default function Editor() {
     <div className="dmgly">
       <main className="editor-main">
         <div className="intro">
+          <span className="intro-brand">Dmgly</span>
           <h1>
             <span>Make your installer</span>{" "}
             <span>feel like your app.</span>
