@@ -68,7 +68,7 @@ export function textBounds(d: Composition) {
 export function decorationsMarkup(d: Composition): string {
   let result = "";
   if (d.arrow.visible)
-    result += `<g transform="translate(${d.arrow.x} ${d.arrow.y}) rotate(${d.arrow.rotation})"><path d="${arrowPath(d)}" fill="none" stroke="${d.arrow.color}" stroke-width="${d.arrow.thickness}" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+    result += `<g transform="translate(${d.arrow.x} ${d.arrow.y}) rotate(${d.arrow.rotation}) scale(${d.arrow.scale})"><path d="${arrowPath(d)}" fill="none" stroke="${d.arrow.color}" stroke-width="${d.arrow.thickness}" stroke-linecap="round" stroke-linejoin="round"/></g>`;
   if (d.text.visible) {
     const t = d.text,
       lines = t.content.split("\n"),
@@ -78,7 +78,7 @@ export function decorationsMarkup(d: Composition): string {
       font = { sans: "Arial, sans-serif", serif: "Georgia, serif", mono: "Courier New, monospace" }[
         t.font
       ];
-    result += `<text font-family="${font}" font-size="${t.size}" fill="${t.color}" text-anchor="${anchor}" dominant-baseline="central" xml:space="preserve">${lines.map((line, i) => `<tspan x="${x}" y="${t.y + (i - (lines.length - 1) / 2) * t.size * 1.3}">${escapeXml(line)}</tspan>`).join("")}</text>`;
+    result += `<text transform="rotate(${t.rotation} ${t.x} ${t.y})" font-family="${font}" font-size="${t.size}" fill="${t.color}" text-anchor="${anchor}" dominant-baseline="central" xml:space="preserve">${lines.map((line, i) => `<tspan x="${x}" y="${t.y + (i - (lines.length - 1) / 2) * t.size * 1.3}">${escapeXml(line)}</tspan>`).join("")}</text>`;
   }
   return result;
 }

@@ -211,10 +211,7 @@ export function ExportDialog({ document: d }: { document: Composition }) {
               {busy ? "Preparing files…" : "Download ZIP"}
             </button>
           </div>
-          <p className="export-message" role="status">
-            {message ||
-              "Includes your background, configuration, and setup instructions."}
-          </p>
+
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

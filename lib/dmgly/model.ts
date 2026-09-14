@@ -54,6 +54,7 @@ export const compositionSchema = z.object({
     size: number(12, 64),
     color,
     align: z.enum(["left", "center", "right"]),
+    rotation: number(-180, 180).default(0),
   }),
   arrow: position.extend({
     visible: z.boolean(),
@@ -62,6 +63,7 @@ export const compositionSchema = z.object({
     width: number(32, 240),
     thickness: number(2, 14),
     rotation: number(-180, 180),
+    scale: number(0.25, 4).default(1),
   }),
 });
 export type Composition = z.infer<typeof compositionSchema>;
@@ -103,6 +105,7 @@ export function createComposition(): Composition {
       size: 18,
       color: "#ffffff",
       align: "center",
+      rotation: 0,
       x: 153,
       y: 273,
     },
@@ -113,6 +116,7 @@ export function createComposition(): Composition {
       width: 165,
       thickness: 4,
       rotation: 34,
+      scale: 1,
       x: 242,
       y: 105,
     },

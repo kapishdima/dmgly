@@ -16,6 +16,7 @@ import { DmgCanvas } from "./canvas";
 import { useDraft } from "./use-draft";
 import { useComposition } from "./use-composition";
 import { ElementId } from "@/lib/dmgly/model";
+import { selectElement } from "@/lib/dmgly/transforms";
 import "./editor.css";
 
 export default function Editor() {
@@ -31,7 +32,10 @@ export default function Editor() {
     restore,
   } = useComposition();
   const draft = useDraft(document, restore);
-  const [selected, setSelected] = useState<ElementId>("background");
+  const [selection, setSelection] = useState<ElementId[]>(["background"]);
+  const selected = selection[selection.length - 1] ?? "background";
+  const select = (id: ElementId, additive = false) =>
+    setSelection((current) => selectElement(current, id, additive));
   return (
     <div className="dmgly">
       <main className="editor-main">
@@ -60,12 +64,12 @@ export default function Editor() {
             </nav>
           </div>
           <h1>
-            <span>Make your installer</span>{" "}
-            <span>feel like your app.</span>
+            <span>Make your installer</span>
+            <span>feel like your app</span>
           </h1>
           <p>
-            <span>Design your DMG background and layout.</span>{" "}
-            <span>Export for Electron, Tauri, or Swift.</span>
+            <span>Design your DMG background and layout</span>{" "}
+            <span>Export for Electron, Tauri, or Swift</span>
           </p>
         </div>
         <div
@@ -108,8 +112,8 @@ export default function Editor() {
             </div>
             <DmgCanvas
               document={document}
-              selected={selected}
-              onSelect={setSelected}
+              selected={selection}
+              onSelectionChange={setSelection}
               onChange={setDocument}
               onBegin={begin}
               onEnd={end}
@@ -124,7 +128,7 @@ export default function Editor() {
           <Inspector
             document={document}
             selected={selected}
-            onSelect={setSelected}
+            onSelect={select}
             onChange={setDocument}
             onBegin={begin}
             onEnd={end}
