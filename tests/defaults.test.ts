@@ -3,8 +3,20 @@ import { createComposition, parseComposition, type Composition } from "../lib/dm
 import { upgradeStarterDraft } from "../lib/dmgly/defaults";
 import { artworkSvg } from "../lib/dmgly/artwork";
 
-function previousStarter(): Composition {
+function previousImageStarter(): Composition {
   const d = createComposition();
+  d.window = { width: 660, height: 400 };
+  d.app.x = 180;
+  d.app.y = 170;
+  d.applications = { x: 480, y: 170 };
+  d.text.x = 330;
+  d.text.y = 302;
+  Object.assign(d.arrow, { shape: "straight", width: 86, rotation: 0, x: 330, y: 170 });
+  return d;
+}
+
+function previousStarter(): Composition {
+  const d = previousImageStarter();
   d.background.mode = "gradient";
   d.background.image = null;
   d.text.color = "#684631";
@@ -42,7 +54,7 @@ test.each([
   ["Dithering@2x (2).png", "third-default-background.png"],
 ])("the %s starter updates without replacing custom artwork or composition", async (name, fixture) => {
   const bytes = await Bun.file(new URL(`./fixtures/${fixture}`, import.meta.url)).arrayBuffer();
-  const original = createComposition();
+  const original = previousImageStarter();
   original.background.image = {
     name,
     data: `data:image/png;base64,${Buffer.from(bytes).toString("base64")}`,
@@ -53,7 +65,15 @@ test.each([
   const moved = structuredClone(original);
   moved.app.x += 10;
   expect(await upgradeStarterDraft(moved)).toBe(moved);
-  const differentImage = createComposition();
+  const differentImage = previousImageStarter();
   differentImage.background.image!.name = name;
   expect(await upgradeStarterDraft(differentImage)).toBe(differentImage);
+});
+
+
+test("the previous opaque image starter receives the new layout", async () => {
+  expect(await upgradeStarterDraft(parseComposition(previousImageStarter()))).toEqual(createComposition());
+  const customized = previousImageStarter();
+  customized.arrow.rotation = 20;
+  expect(await upgradeStarterDraft(customized)).toBe(customized);
 });

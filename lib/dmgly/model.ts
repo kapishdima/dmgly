@@ -76,9 +76,9 @@ export const FONT_FAMILIES = {
 export function createComposition(): Composition {
   return {
     version: 1,
-    window: { width: 660, height: 400 },
-    app: { name: "My App", x: 180, y: 170, image: null },
-    applications: { x: 480, y: 170 },
+    window: { width: 642, height: 406 },
+    app: { name: "My App", x: 95, y: 90, image: null },
+    applications: { x: 367, y: 213 },
     background: {
       mode: "image",
       solid: "#f4f1eb",
@@ -103,18 +103,18 @@ export function createComposition(): Composition {
       size: 18,
       color: "#ffffff",
       align: "center",
-      x: 330,
-      y: 302,
+      x: 153,
+      y: 273,
     },
     arrow: {
       visible: true,
-      shape: "straight",
+      shape: "curved",
       color: "#ffffff",
-      width: 86,
+      width: 165,
       thickness: 4,
-      rotation: 0,
-      x: 330,
-      y: 170,
+      rotation: 34,
+      x: 242,
+      y: 105,
     },
   };
 }

@@ -10,7 +10,7 @@ test("a whole drag is one undo step and redo restores it", () => {
   h = reduceHistory(h, { type: "end" });
   expect(h.past.length).toBe(1);
   h = reduceHistory(h, { type: "undo" });
-  expect(h.present.app.x).toBe(180);
+  expect(h.present.app.x).toBe(d.app.x);
   h = reduceHistory(h, { type: "redo" });
   expect(h.present.app.x).toBe(220);
 });

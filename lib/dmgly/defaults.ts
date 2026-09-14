@@ -3,21 +3,30 @@ import { Composition, createComposition, parseComposition } from "./model";
 /** Upgrade only untouched starter compositions, preserving customized drafts. */
 export async function upgradeStarterDraft(draft: Composition): Promise<Composition> {
   const current = createComposition();
-  const previous: Composition = {
+  const previousImage: Composition = {
     ...current,
+    window: { width: 660, height: 400 },
+    app: { ...current.app, x: 180, y: 170 },
+    applications: { x: 480, y: 170 },
+    text: { ...current.text, x: 330, y: 302 },
+    arrow: { ...current.arrow, shape: "straight", width: 86, rotation: 0, x: 330, y: 170 },
+  };
+  const previous: Composition = {
+    ...previousImage,
     background: { ...current.background, mode: "gradient", image: null },
-    text: { ...current.text, color: "#684631" },
-    arrow: { ...current.arrow, color: "#946241" },
+    text: { ...previousImage.text, color: "#684631" },
+    arrow: { ...previousImage.arrow, color: "#946241" },
   };
   const serialized = JSON.stringify(parseComposition(draft));
   if (serialized === JSON.stringify(parseComposition(previous))) return current;
+  if (serialized === JSON.stringify(parseComposition(previousImage))) return current;
 
   const image = draft.background.image;
   if (
     image && ["Dithering@2x.png", "Dithering@2x (1).png", "Dithering@2x (2).png"].includes(image.name) &&
     image.width === 1600 && image.height === 1200 &&
     serialized === JSON.stringify(parseComposition({
-      ...current,
+      ...previousImage,
       background: { ...current.background, image },
     })) &&
     globalThis.crypto?.subtle

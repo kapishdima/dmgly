@@ -39,3 +39,5 @@ The installed `base-luma` Button and Card use `rounded-4xl`. Editor surfaces and
 Background has at least 96 px at normal widths. Below 360 px the element tabs use two rows. Browser checks at 1280, 390, and 320 px confirmed no page overflow and no clipped tab labels. Switching Background to App preserved the inspector footer bounds. The export dialog remains usable at 320 px. ESLint and production build, including TypeScript, passed.
 
 The latest supplied PNG has fully opaque pixels (alpha 255 throughout), eliminating the pale appearance caused by the previous PNG’s 60% opacity.
+
+The default layout now follows the supplied composition: window 642 × 406, app center (95, 90), and Applications center (367, 213). The screenshot-derived decoration positions are text (153, 273) and curved arrow (242, 105), width 165, rotation 34°. Browser verification confirms the arrangement after restoring the previous untouched starter; the exported Electron configuration exactly matches the supplied JSON. Customized saved layouts are preserved.

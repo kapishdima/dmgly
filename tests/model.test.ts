@@ -21,11 +21,12 @@ test("positions clamp without mutating input", () => {
   const d = createComposition();
   const next = moveElement(d, "app", -300, 9999);
   expect(next.app.x).toBe(72);
-  expect(next.app.y).toBe(272);
-  expect(d.app.x).toBe(180);
+  expect(next.app.y).toBe(278);
+  expect(d.app.x).toBe(95);
 });
 test("resizing constrains native icons and snapshot stays isolated", () => {
   const d = createComposition();
+  d.applications.x = 600;
   const small = resizeWindow(d, 480, 320);
   expect(small.applications.x).toBe(408);
   const copy = snapshot(d);

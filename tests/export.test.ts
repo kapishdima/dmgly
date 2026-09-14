@@ -6,7 +6,7 @@ test("Electron exports exact icon centers and a resource-backed config", () => {
   d.app.x = 222;
   const result = electronConfig(d),
     config = JSON.parse(result.content);
-  expect(config.dmg.contents[0]).toEqual({ x: 222, y: 170, type: "file" });
+  expect(config.dmg.contents[0]).toEqual({ x: 222, y: 90, type: "file" });
   expect(config.dmg.contents[1].path).toBe("/Applications");
   expect(config.dmg.background.endsWith(result.assets[0])).toBe(true);
   expect(config.dmg.backgroundColor).toBeUndefined();
@@ -18,7 +18,7 @@ test("Tauri uses the nested DMG config with its supported fields", () => {
     r = tauriConfig(d),
     v = JSON.parse(r.content);
   expect(v.bundle.macOS.dmg.windowSize).toEqual(d.window);
-  expect(v.bundle.macOS.dmg.appPosition).toEqual({ x: 180, y: 170 });
+  expect(v.bundle.macOS.dmg.appPosition).toEqual({ x: 95, y: 90 });
   expect(v.bundle.macOS.dmg.iconSize).toBeUndefined();
   expect(r.warnings.length).toBe(1);
 });
@@ -31,7 +31,7 @@ test("native script is valid Bash and handles paths via quoted arguments", () =>
   const check = spawnSync("bash", ["-n"], { input: r.content });
   expect(check.status).toBe(0);
   expect(r.content).not.toContain("touch unsafe");
-  expect(r.content).toContain('--icon "$APP_NAME" 180 170');
+  expect(r.content).toContain('--icon "$APP_NAME" 95 90');
   expect(r.content).toContain('[[ ! -e "$OUTPUT" ]]');
   expect(shellQuote("O'Reilly")).toBe("'O'\\''Reilly'");
 });
@@ -49,4 +49,18 @@ test("AI prompts use the selected target snapshot and safe data fences", () => {
     expect(prompt).toContain("assets/dmg-background.png");
   }
   expect(fenced("```\ntext")).toStartWith("````\n");
+});
+
+
+test("the default Electron configuration matches the requested composition", () => {
+  const config = JSON.parse(electronConfig(createComposition()).content);
+  expect(config.dmg).toEqual({
+    background: "build/dmgly/assets/dmg-background.png",
+    window: { width: 642, height: 406 },
+    iconSize: 128,
+    contents: [
+      { x: 95, y: 90, type: "file" },
+      { x: 367, y: 213, type: "link", path: "/Applications" },
+    ],
+  });
 });
