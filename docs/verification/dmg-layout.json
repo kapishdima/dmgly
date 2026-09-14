@@ -1,0 +1,121 @@
+{
+  "native": {
+    ".:bwsp": {
+      "ShowStatusBar": false,
+      "ShowToolbar": false,
+      "ShowTabView": false,
+      "ContainerShowSidebar": false,
+      "WindowBounds": "{{10, 496}, {660, 400}}",
+      "ShowSidebar": false
+    },
+    ".:icvp": {
+      "backgroundColorBlue": 1.0,
+      "showIconPreview": true,
+      "labelOnBottom": true,
+      "textSize": 16.0,
+      "backgroundColorRed": 1.0,
+      "backgroundType": 2,
+      "backgroundColorGreen": 1.0,
+      "gridOffsetX": 0.0,
+      "gridOffsetY": 0.0,
+      "showItemInfo": false,
+      "viewOptionsVersion": 1,
+      "arrangeBy": "none",
+      "iconSize": 128.0,
+      "gridSpacing": 100.0
+    },
+    "Applications:Iloc": [
+      480,
+      170
+    ],
+    "My App.app:Iloc": [
+      180,
+      170
+    ],
+    "applicationsLink": "/Applications",
+    "backgrounds": {
+      ".background/dmg-background.png": "706b312dec082b211ad3342fc6c1f65617db3c4ab287a1041294638658ac25c7"
+    }
+  },
+  "electron": {
+    ".:bwsp": {
+      "ContainerShowSidebar": false,
+      "PreviewPaneVisibility": false,
+      "ShowPathbar": false,
+      "ShowSidebar": false,
+      "ShowStatusBar": false,
+      "ShowTabView": false,
+      "ShowToolbar": false,
+      "SidebarWidth": 180,
+      "WindowBounds": "{{400, 520}, {660, 400}}"
+    },
+    ".:icvp": {
+      "arrangeBy": "none",
+      "backgroundColorBlue": 1.0,
+      "backgroundColorGreen": 1.0,
+      "backgroundColorRed": 1.0,
+      "backgroundType": 2,
+      "gridOffsetX": 0.0,
+      "gridOffsetY": 0.0,
+      "gridSpacing": 100.0,
+      "iconSize": 128.0,
+      "labelOnBottom": true,
+      "scrollPositionX": 0.0,
+      "scrollPositionY": 0.0,
+      "showIconPreview": false,
+      "showItemInfo": false,
+      "textSize": 12.0,
+      "viewOptionsVersion": 1
+    },
+    "Applications:Iloc": [
+      480,
+      170
+    ],
+    "My App.app:Iloc": [
+      180,
+      170
+    ],
+    "applicationsLink": "/Applications",
+    "backgrounds": {
+      ".background.png": "706b312dec082b211ad3342fc6c1f65617db3c4ab287a1041294638658ac25c7"
+    }
+  },
+  "tauri": {
+    ".:bwsp": {
+      "ShowStatusBar": false,
+      "ShowToolbar": false,
+      "ShowTabView": false,
+      "ContainerShowSidebar": false,
+      "WindowBounds": "{{10, 496}, {660, 400}}",
+      "ShowSidebar": false
+    },
+    ".:icvp": {
+      "backgroundColorBlue": 1.0,
+      "showIconPreview": true,
+      "labelOnBottom": true,
+      "textSize": 16.0,
+      "backgroundColorRed": 1.0,
+      "backgroundType": 2,
+      "backgroundColorGreen": 1.0,
+      "gridOffsetX": 0.0,
+      "gridOffsetY": 0.0,
+      "showItemInfo": false,
+      "viewOptionsVersion": 1,
+      "arrangeBy": "none",
+      "iconSize": 128.0,
+      "gridSpacing": 100.0
+    },
+    "Applications:Iloc": [
+      480,
+      170
+    ],
+    "My App.app:Iloc": [
+      180,
+      170
+    ],
+    "applicationsLink": "/Applications",
+    "backgrounds": {
+      ".background/dmg-background.png": "706b312dec082b211ad3342fc6c1f65617db3c4ab287a1041294638658ac25c7"
+    }
+  }
+}

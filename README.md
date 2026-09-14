@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dmgly
 
-## Getting Started
+A browser-based editor for the first moment of installing a macOS app. Arrange an installer in a live Finder-style preview, then take the artwork and packaging settings into your project.
 
-First, run the development server:
+## Run locally
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```sh
+bun install
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. No API keys or server-side storage are required. Images stay in the browser; the current composition and uploads are saved to IndexedDB on this device.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+bun run test
+bun run typecheck
+bun run lint
+bun run build
+bun run start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Design and export
 
-## Learn More
+- Drag the app, Applications folder, instruction text, and arrow directly in the preview. Use arrow keys for 1 px movement or Shift+Arrow for 10 px.
+- Use contextual DialKit controls for exact positions, colors, typography, gradients, images, and window dimensions.
+- Choose a solid color, linear/radial gradient, or uploaded PNG/JPEG/WebP background. Text and arrow have independent visibility switches.
+- Undo/redo works across the canvas and properties. Command/Ctrl+Z and Shift+Command/Ctrl+Z work outside text fields.
+- Export an electron-builder fragment, Tauri 2 fragment, or create-dmg script for an existing native macOS app.
+- Copy the selected configuration or an English AI setup prompt. Download the ZIP to transfer the PNG artwork and supporting files as well.
 
-To learn more about Next.js, take a look at the following resources:
+The ZIP contains a 1x PNG background, selected configuration/script, setup instructions, and the same AI prompt shown in the editor. An uploaded app icon is included as a normalized PNG reference for your existing icon pipeline.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scope
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The browser creates artwork and configuration; the actual DMG is built on macOS in your application repository. The app and Applications icons remain real Finder items. Finder chrome, labels, and native icons vary by system and are approximate in the preview. The shared native icon size is 128 px.
 
-## Deploy on Vercel
+PNG, JPEG, and WebP uploads are limited to 10 MB, 8192 px per side, and 16 megapixels. ICNS/SVG uploads and Retina backgrounds are not supported in this MVP. No AI API is called: prompts are generated deterministically from the export snapshot. Logo design is deferred.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+A tiling window manager can override Finder geometry during Tauri/create-dmg packaging. Pause those layout rules while building and restore them afterwards.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Implementation and evidence
+
+The app uses Next.js App Router, React, DialKit, Zod, and fflate. `lib/dmgly` owns the shared document, history, artwork, persistence, and export adapters; `components/editor` contains the interaction layer.
+
+- [Product design](docs/plans/2026-09-14-dmg-preview-design.md)
+- [Packaging contract](docs/research/packaging-contract.md)
+- [MVP verification](docs/verification/mvp.md)

@@ -33,7 +33,7 @@ Tauri's bundler resolves background paths from its working directory and forward
 
 ## Verification status
 
-Official documentation and upstream implementation were inspected. Native .app fixtures and packaging dependencies are not part of this web repository yet, so three actual end-to-end build comparisons have not been performed in this research task. They are explicitly tracked in REM-431; no visual/build parity is claimed until that task records evidence. This limitation does not prevent implementing the contract above.
+Official documentation and upstream implementation were inspected. REM-431 subsequently built and opened all three DMG formats using disposable native fixtures. Window dimensions, icon size/positions, Applications links, and background bytes were verified; see [the verification report](../verification/mvp.md). Finder chrome and label typography remain approximations. Tiling window managers must not resize Finder during create-dmg/Tauri customization.
 
 ## Sources
 
