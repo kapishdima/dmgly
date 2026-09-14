@@ -52,6 +52,14 @@ bun run dev
 
 Open [localhost:3000](http://localhost:3000).
 
+### Analytics
+
+Production builds track page views and outgoing links with OpenPanel at `https://op.kapish.dev/api`. Development runs do not send analytics. The integration uses a public client ID; no client secret is needed or shipped to the browser.
+
+Allow the deployed site's domain in the OpenPanel project settings. A `401` response with `Invalid cors or secret` means browser ingestion is not authorized for that origin.
+
+Page views follow pathname changes only, so editing design settings in the URL does not create extra views or send the composition query. Session replay is disabled. The integration lives in [`components/analytics.tsx`](components/analytics.tsx).
+
 <details>
 <summary>Development commands &amp; internals</summary>
 
