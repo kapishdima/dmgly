@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Composition, compositionSchema } from "@/lib/dmgly/model";
 import { loadDraft, saveDraft } from "@/lib/dmgly/persistence";
+import { upgradeStarterDraft } from "@/lib/dmgly/defaults";
 export function useDraft(document: Composition, restore: (d: Composition) => void) {
   const [ready, setReady] = useState(false),
     [status, setStatus] = useState("Opening draft…");
@@ -17,7 +18,7 @@ export function useDraft(document: Composition, restore: (d: Composition) => voi
         if (!active) return;
         if (value) {
           saved.current = value;
-          restore(value);
+          restore(upgradeStarterDraft(value));
         }
         setStatus("Saved on this device");
       })

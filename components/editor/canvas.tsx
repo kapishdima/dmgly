@@ -205,7 +205,7 @@ export function DmgCanvas({
                 </span>
               </div>
               <div
-                className="artboard"
+                className={`artboard${d.background.mode === "image" ? " image-background" : ""}`}
                 style={{ height: d.window.height - TITLEBAR_HEIGHT }}
                 onClick={() => onSelect("background")}
               >

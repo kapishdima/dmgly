@@ -14,6 +14,12 @@ Other interface icons use the existing Hugeicons package. Editable installation 
 
 `public/assets/generic-application.png` is the macOS generic application artwork, rendered at 256 px via `NSWorkspace.shared.icon(forFile:)` from the iconless test fixture used for native DMG verification on this host. It appears at 128 logical pixels until the user uploads an icon. The older `CoreTypes.bundle/GenericApplicationIcon.icns` differs from Finder's current resolved icon, so that legacy asset is not used. Apple retains rights to its system artwork. This image is preview-only; real DMGs get their icon from the built app.
 
+## Default background
+
+The user-supplied `Dithering@2x.png` (1600 × 1200, 81,805 bytes) is embedded without modifying its bytes in `lib/dmgly/default-background.json`. New compositions start in Image mode with this self-contained asset, so initial rendering and SVG-to-PNG export do not wait for an external image request. Default text and arrows use white; image-background icon labels receive a light backing for readability.
+
+Restoring the exact old, untouched gradient starter upgrades it to the new default. Customized drafts are preserved. Browser reload verified the new image and the selected Image mode; the default composition successfully downloaded as an export ZIP. Regression tests cover embedded artwork and legacy draft migration, including schema-normalized property order.
+
 ## Export and validation
 
 The export dialog uses Base UI Select with keyboard navigation and a stable code viewport. Shiki 4.4.3 is loaded on demand with only JSON, Bash, Markdown, and one light theme. Its JavaScript regex engine avoids a separate WASM request. The AI prompt wraps at the viewport edge; configuration keeps its code indentation. Copying still uses the original text, independent of highlighting.

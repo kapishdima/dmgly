@@ -14,6 +14,7 @@ test("export markup escapes user text and excludes hidden decorations", () => {
 });
 test("gradient stop sorting does not reorder the editable model", () => {
   const d = createComposition();
+  d.background.mode = "gradient";
   d.background.gradient.stops.reverse();
   const before = JSON.stringify(d);
   expect(artworkSvg(d).indexOf('offset="0%"')).toBeLessThan(artworkSvg(d).indexOf('offset="100%"'));

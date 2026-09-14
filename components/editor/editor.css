@@ -395,6 +395,9 @@
 .native-object.selected .icon-label {
   background: rgb(255 255 255 / 65%);
 }
+.image-background .icon-label {
+  background: rgb(255 255 255 / 88%);
+}
 .guide {
   position: absolute;
   background: #77776d;

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import defaultBackground from "./default-background.json";
 
 export const ICON_SIZE = 128;
 export const TITLEBAR_HEIGHT = 32;
@@ -79,7 +80,7 @@ export function createComposition(): Composition {
     app: { name: "My App", x: 180, y: 170, image: null },
     applications: { x: 480, y: 170 },
     background: {
-      mode: "gradient",
+      mode: "image",
       solid: "#f4f1eb",
       gradient: {
         type: "linear",
@@ -89,7 +90,7 @@ export function createComposition(): Composition {
           { id: "b", color: "#e9a26c", at: 100 },
         ],
       },
-      image: null,
+      image: { ...defaultBackground },
       fit: "fill",
       scale: 1,
       x: 0,
@@ -100,7 +101,7 @@ export function createComposition(): Composition {
       content: "Drag to Applications to install",
       font: "sans",
       size: 18,
-      color: "#684631",
+      color: "#ffffff",
       align: "center",
       x: 330,
       y: 302,
@@ -108,7 +109,7 @@ export function createComposition(): Composition {
     arrow: {
       visible: true,
       shape: "straight",
-      color: "#946241",
+      color: "#ffffff",
       width: 86,
       thickness: 4,
       rotation: 0,
