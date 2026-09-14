@@ -1,9 +1,11 @@
 .dmgly {
   --ink: #262623;
   --muted: #73736c;
-  --paper: #fafaf8;
+  --paper: #f5f5f2;
   --line: rgb(0 0 0 / 8%);
   --surface: #fff;
+  --editor-radius: var(--radius-4xl, calc(var(--radius) * 2.6));
+  --editor-radius-inner: var(--radius-2xl, calc(var(--radius) * 1.8));
   --z-guide: 10;
   --z-modal: 200;
   --z-dropdown: 300;
@@ -64,7 +66,7 @@
   flex-shrink: 0;
   pointer-events: none;
 }
-.site-header,
+.site-header-inner,
 .editor-main,
 .site-footer {
   max-width: 1440px;
@@ -72,7 +74,12 @@
   padding-inline: 40px;
 }
 .site-header {
-  height: 80px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 2%);
+}
+.site-header-inner {
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -97,7 +104,7 @@
   padding-bottom: 32px;
 }
 .intro h1 {
-  font-size: clamp(28px, 3vw, 36px);
+  font-size: clamp(26px, 3vw, 32px);
   font-weight: 500;
   letter-spacing: -0.8px;
 }
@@ -108,8 +115,14 @@
 }
 .workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 32px;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 0;
+  padding: 8px;
+  border-radius: calc(var(--editor-radius) + 8px);
+  background: #e9e9e4;
+  box-shadow:
+    0 0 0 1px var(--line),
+    0 16px 40px -24px rgb(0 0 0 / 18%);
   align-items: start;
   isolation: isolate;
 }
@@ -118,14 +131,22 @@
   height: 660px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
+  padding: 12px 20px;
+  border-radius: var(--editor-radius) 0 0 var(--editor-radius);
+  background: radial-gradient(
+    ellipse at 48% 45%,
+    #f8f8f5,
+    #eeeee9 60%,
+    #e9e9e4
+  );
 }
 .preview-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 80px;
+  min-height: 64px;
   gap: 16px;
-  padding: 0 0 20px;
+  padding: 0 0 12px;
   border-bottom: 1px solid var(--line);
 }
 .preview-toolbar h2,
@@ -156,7 +177,7 @@
   gap: 8px;
   min-height: 40px;
   border: 0;
-  border-radius: 9px;
+  border-radius: var(--editor-radius);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -407,15 +428,17 @@
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto auto;
   background: var(--surface);
-  border-radius: 16px;
-  box-shadow: 0 0 0 1px var(--line);
+  border-radius: var(--editor-radius);
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 4%),
+    -4px 4px 16px rgb(0 0 0 / 4%);
 }
 .inspector-heading {
   padding: 20px 20px 16px;
 }
 .element-tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: minmax(96px, 1.6fr) repeat(4, minmax(0, 1fr));
   gap: 4px;
   padding: 0 12px 16px;
   border-bottom: 1px solid var(--line);
@@ -430,9 +453,10 @@
   min-width: 0;
   padding: 6px 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--editor-radius-inner);
   background: transparent;
-  font-size: 11px;
+  font-size: 12px;
+  white-space: nowrap;
   font-weight: 500;
   color: #797972;
 }
@@ -458,7 +482,7 @@
 }
 .dmgly .dialkit-root {
   --dial-row-height: 40px;
-  --dial-radius: 8px;
+  --dial-radius: var(--editor-radius);
   --dial-text-label: #62625b;
   --dial-text-primary: #34342f;
   --dial-text-secondary: #73736b;
@@ -474,7 +498,7 @@
   display: flex;
   gap: 3px;
   padding: 3px;
-  border-radius: 10px;
+  border-radius: var(--editor-radius);
   background: #f0f0ec;
 }
 .segment button {
@@ -483,7 +507,7 @@
   min-height: 36px;
   padding: 6px 8px;
   border: 0;
-  border-radius: 7px;
+  border-radius: calc(var(--editor-radius) - 3px);
   background: transparent;
   color: #72726b;
   font-size: 13px;
@@ -594,7 +618,7 @@
   min-height: 116px;
   padding: 16px;
   border: 1px dashed rgb(0 0 0 / 18%);
-  border-radius: 10px;
+  border-radius: var(--editor-radius);
   cursor: pointer;
   color: #68685f;
 }
@@ -644,22 +668,23 @@
   list-style: none;
 }
 @media (max-width: 1100px) {
-  .site-header,
+  .site-header-inner,
   .editor-main,
   .site-footer {
     padding-inline: 24px;
   }
   .workspace {
-    grid-template-columns: minmax(0, 1fr) 316px;
-    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) 340px;
   }
 }
 @media (max-width: 850px) {
   .workspace {
     grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
   .preview-area {
     height: 560px;
+    border-radius: var(--editor-radius);
   }
   .inspector {
     height: 660px;
@@ -672,12 +697,12 @@
   }
 }
 @media (max-width: 520px) {
-  .site-header,
+  .site-header-inner,
   .editor-main,
   .site-footer {
     padding-inline: 20px;
   }
-  .site-header {
+  .site-header-inner {
     height: 64px;
   }
   .intro {
@@ -689,6 +714,26 @@
   }
   .preview-area {
     height: 450px;
+    padding: 12px;
+  }
+  .workspace {
+    padding: 6px;
+    border-radius: calc(var(--editor-radius) + 6px);
+  }
+  .canvas-toolbar {
+    gap: 8px;
+  }
+  .toolbar-muted {
+    white-space: nowrap;
+  }
+  .zoom-controls {
+    gap: 0;
+  }
+  .zoom-controls output {
+    min-width: 36px;
+  }
+  .zoom-controls .toolbar-button {
+    margin-left: 0;
   }
   .preview-toolbar {
     align-items: flex-start;
@@ -734,6 +779,18 @@
     font-size: 16px;
   }
 }
+@media (max-width: 360px) {
+  .element-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .element-tabs button:first-child {
+    grid-column: span 2;
+  }
+  .canvas-toolbar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .dmgly *,
   .dmgly *::before,
@@ -766,7 +823,7 @@
   grid-template-rows: auto auto auto minmax(100px, 1fr) auto auto auto;
   gap: 20px;
   background: #fff;
-  border-radius: 20px;
+  border-radius: var(--editor-radius);
   padding: 28px;
   box-shadow:
     0 0 0 1px rgb(0 0 0 / 6%),
@@ -810,7 +867,7 @@
   min-height: 44px;
   padding: 8px 12px;
   border: 0;
-  border-radius: 9px;
+  border-radius: var(--editor-radius);
   background: #f5f5f2;
   box-shadow: inset 0 0 0 1px var(--line);
   color: var(--ink);
@@ -826,7 +883,7 @@
   min-height: 0;
   width: var(--anchor-width);
   background: #fff;
-  border-radius: 12px;
+  border-radius: var(--editor-radius-inner);
   padding: 4px;
   box-shadow:
     0 0 0 1px rgb(0 0 0 / 7%),
@@ -839,7 +896,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  border-radius: 8px;
+  border-radius: calc(var(--editor-radius-inner) - 4px);
   cursor: pointer;
   outline: none;
   font-size: 14px;
@@ -867,7 +924,7 @@
   min-height: 0;
   min-width: 0;
   background: #fbfbf9;
-  border-radius: 12px;
+  border-radius: var(--editor-radius-inner);
   box-shadow: inset 0 0 0 1px var(--line);
   overflow: hidden;
 }

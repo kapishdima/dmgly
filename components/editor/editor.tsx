@@ -35,24 +35,37 @@ export default function Editor() {
   return (
     <div className="dmgly">
       <header className="site-header">
-        <Link className="wordmark" href="/" aria-label="Dmgly homepage">
-          Dmgly
-        </Link>
-        <p className="header-note">A thoughtful welcome for your Mac app.</p>
+        <div className="site-header-inner">
+          <Link className="wordmark" href="/" aria-label="Dmgly homepage">
+            Dmgly
+          </Link>
+          <p className="header-note">DMG design studio</p>
+        </div>
       </header>
       <main className="editor-main">
         <div className="intro">
           <h1>Make the first impression yours</h1>
-          <p>Arrange your installer, fine-tune the details, and take it into your app.</p>
+          <p>
+            Arrange your installer, fine-tune the details, and take it into your
+            app.
+          </p>
         </div>
-        <div className="workspace" inert={!draft.ready} aria-busy={!draft.ready}>
+        <div
+          className="workspace"
+          inert={!draft.ready}
+          aria-busy={!draft.ready}
+        >
           <section className="preview-area" aria-label="DMG preview">
             <div className="preview-toolbar">
               <div>
                 <h2>Preview</h2>
                 <p>Your installer, as you make it.</p>
               </div>
-              <div className="history-toolbar" role="group" aria-label="Edit history">
+              <div
+                className="history-toolbar"
+                role="group"
+                aria-label="Edit history"
+              >
                 <button
                   type="button"
                   className="toolbar-button"
