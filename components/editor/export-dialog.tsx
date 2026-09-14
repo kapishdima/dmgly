@@ -1,12 +1,12 @@
 "use client";
 import { useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import {
   Cancel01Icon,
   Copy01Icon,
   Download01Icon,
   CodeIcon,
   SparklesIcon,
-  ArrowUpRight01Icon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { PlatformSelect } from "./platform-select";
@@ -80,7 +80,19 @@ export function ExportDialog({ document: d }: { document: Composition }) {
       }}
     >
       <Dialog.Trigger className="primary-button">
-        Export design <Icon icon={ArrowUpRight01Icon} />
+        Export design
+        <span className="export-platforms" aria-hidden="true">
+          {(["tauri", "electron", "swift"] as const).map((platform) => (
+            <span className="export-platform" key={platform}>
+              <Image
+                src={`/assets/platforms/${platform}.svg`}
+                alt=""
+                width={16}
+                height={16}
+              />
+            </span>
+          ))}
+        </span>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop className="export-backdrop" />

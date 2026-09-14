@@ -122,14 +122,6 @@ export default function Editor() {
           </Inspector>
         </div>
       </main>
-      <footer className="site-footer">
-        <p>Made for the moment before “Open”.</p>
-        <ul role="list" aria-label="Supported platforms">
-          <li>Electron</li>
-          <li>Tauri</li>
-          <li>Swift</li>
-        </ul>
-      </footer>
     </div>
   );
 }
