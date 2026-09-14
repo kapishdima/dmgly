@@ -1,4 +1,6 @@
-# DMG Preview — agreed MVP
+# Dmgly — agreed MVP
+
+Product name: **Dmgly**. Use this capitalization in product copy and documentation.
 
 Status: MVP scope, a light homepage editor, and AI prompt export are agreed. DialKit is being evaluated for the properties panel.
 
