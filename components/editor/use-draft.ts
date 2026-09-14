@@ -14,11 +14,13 @@ export function useDraft(document: Composition, restore: (d: Composition) => voi
   useEffect(() => {
     let active = true;
     loadDraft()
-      .then((value) => {
+      .then(async (value) => {
         if (!active) return;
         if (value) {
+          const upgraded = await upgradeStarterDraft(value);
+          if (!active) return;
           saved.current = value;
-          restore(upgradeStarterDraft(value));
+          restore(upgraded);
         }
         setStatus("Saved on this device");
       })
