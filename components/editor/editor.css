@@ -80,12 +80,42 @@
   gap: 16px;
   padding-bottom: 36px;
 }
-.intro-brand {
+.intro-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   align-self: flex-start;
   margin-bottom: 8px;
+}
+.intro-brand {
   font-size: 0.9375rem;
   line-height: 1.4;
   font-weight: 600;
+}
+.intro-socials {
+  display: flex;
+  gap: 2px;
+}
+.intro-socials a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--muted);
+  border-radius: var(--editor-radius-inner);
+}
+@media (hover: hover) and (pointer: fine) {
+  .intro-socials a:hover {
+    color: var(--ink);
+    background: rgb(0 0 0 / 4%);
+  }
+}
+@media (pointer: coarse) {
+  .intro-socials a {
+    width: 44px;
+    height: 44px;
+  }
 }
 .intro h1 {
   max-width: 20ch;

@@ -5,6 +5,8 @@ import {
   UndoIcon,
   RedoIcon,
   CheckmarkCircle02Icon,
+  GithubIcon,
+  NewTwitterIcon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { ExportDialog } from "./export-dialog";
@@ -34,7 +36,29 @@ export default function Editor() {
     <div className="dmgly">
       <main className="editor-main">
         <div className="intro">
-          <span className="intro-brand">Dmgly</span>
+          <div className="intro-brand-row">
+            <span className="intro-brand">Dmgly</span>
+            <nav className="intro-socials" aria-label="Social links">
+              <a
+                href="https://github.com/kapishdima/dmgly"
+                aria-label="Dmgly on GitHub"
+                title="GitHub"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Icon icon={GithubIcon} size={16} />
+              </a>
+              <a
+                href="https://x.com/kapish_dima"
+                aria-label="Dima on X"
+                title="X"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Icon icon={NewTwitterIcon} size={16} />
+              </a>
+            </nav>
+          </div>
           <h1>
             <span>Make your installer</span>{" "}
             <span>feel like your app.</span>
