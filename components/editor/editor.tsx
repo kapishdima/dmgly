@@ -34,10 +34,13 @@ export default function Editor() {
     <div className="dmgly">
       <main className="editor-main">
         <div className="intro">
-          <h1>Make the first impression yours</h1>
+          <h1>
+            <span>Make your installer</span>{" "}
+            <span>feel like your app.</span>
+          </h1>
           <p>
-            Arrange your installer, fine-tune the details, and take it into your
-            app.
+            <span>Design your DMG background and layout.</span>{" "}
+            <span>Export for Electron, Tauri, or Swift.</span>
           </p>
         </div>
         <div

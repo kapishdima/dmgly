@@ -77,22 +77,26 @@
 .intro {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   padding-bottom: 36px;
 }
 .intro h1 {
   max-width: 20ch;
-  font-size: clamp(32px, 4vw, 52px);
-  line-height: 1.12;
+  font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  line-height: 1.1;
   font-weight: 500;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.025em;
 }
 .intro p {
   color: var(--muted);
-  font-size: clamp(18px, 2vw, 20px);
+  font-size: 1.125rem;
   line-height: 1.5;
   max-width: 38ch;
   text-wrap: balance;
+}
+.intro h1 > span,
+.intro p > span {
+  display: block;
 }
 .workspace {
   display: grid;
