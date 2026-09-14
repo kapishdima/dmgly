@@ -90,8 +90,26 @@
   color: var(--ink);
   text-decoration: none;
 }
-.header-note {
-  color: var(--muted);
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.header-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--editor-radius);
+  color: var(--ink);
+  text-decoration: none;
+  touch-action: manipulation;
+}
+@media (hover: hover) and (pointer: fine) {
+  .header-link:hover {
+    background: var(--paper);
+  }
 }
 .editor-main {
   padding-block: 28px 40px;
@@ -716,9 +734,6 @@
   }
   .inspector {
     height: 660px;
-  }
-  .header-note {
-    display: none;
   }
   .editor-main {
     padding-top: 16px;
