@@ -7,6 +7,7 @@ import {
   CheckmarkCircle02Icon,
   GithubIcon,
   NewTwitterIcon,
+  ReloadIcon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { ExportDialog } from "./export-dialog";
@@ -14,9 +15,9 @@ import { ShortcutsDialog } from "./shortcuts-dialog";
 import { Inspector } from "./properties";
 import { artworkSvg } from "@/lib/dmgly/artwork";
 import { DmgCanvas } from "./canvas";
-import { useDraft } from "./use-draft";
+import { useDesignUrl } from "./use-design-url";
 import { useComposition } from "./use-composition";
-import { ElementId } from "@/lib/dmgly/model";
+import { ElementId, createComposition } from "@/lib/dmgly/model";
 import { selectElement } from "@/lib/dmgly/transforms";
 import "./editor.css";
 
@@ -32,7 +33,7 @@ export default function Editor() {
     canRedo,
     restore,
   } = useComposition();
-  const draft = useDraft(document, restore);
+  const designUrl = useDesignUrl(document, restore);
   const [selection, setSelection] = useState<ElementId[]>(["background"]);
   const selected = selection[selection.length - 1] ?? "background";
   const select = (id: ElementId, additive = false) =>
@@ -75,8 +76,8 @@ export default function Editor() {
         </div>
         <div
           className="workspace"
-          inert={!draft.ready}
-          aria-busy={!draft.ready}
+          inert={!designUrl.ready}
+          aria-busy={!designUrl.ready}
         >
           <section className="preview-area" aria-label="DMG preview">
             <div className="preview-toolbar">
@@ -94,20 +95,38 @@ export default function Editor() {
                   className="toolbar-button"
                   onClick={undo}
                   disabled={!canUndo}
+                  aria-label="Undo"
                   title="Undo (⌘Z / Ctrl+Z)"
                 >
                   <Icon icon={UndoIcon} />
-                  Undo
+                  <span className="history-label">Undo</span>
                 </button>
                 <button
                   type="button"
                   className="toolbar-button"
                   onClick={redo}
                   disabled={!canRedo}
+                  aria-label="Redo"
                   title="Redo (⇧⌘Z / Ctrl+Shift+Z)"
                 >
                   <Icon icon={RedoIcon} />
-                  Redo
+                  <span className="history-label">Redo</span>
+                </button>
+                <button
+                  type="button"
+                  className="toolbar-button"
+                  aria-label="Reset design"
+                  title="Reset design"
+                  onClick={() => {
+                    const value = createComposition();
+                    end();
+                    setDocument(value);
+                    setSelection(["background"]);
+                    designUrl.reset(value);
+                  }}
+                >
+                  <Icon icon={ReloadIcon} />
+                  <span className="history-label">Reset</span>
                 </button>
                 <ShortcutsDialog />
               </div>
@@ -137,10 +156,10 @@ export default function Editor() {
           >
             <div className="inspector-footer">
               <p className="save-status" role="status">
-                {draft.status === "Saved on this device" && (
+                {designUrl.status === "Settings saved in URL" && (
                   <Icon icon={CheckmarkCircle02Icon} size={16} />
                 )}
-                <span>{draft.status}</span>
+                <span>{designUrl.status}</span>
               </p>
               <ExportDialog document={document} />
             </div>

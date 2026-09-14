@@ -1221,3 +1221,8 @@
   fill: #73736c;
   font-weight: 400;
 }
+
+@container (max-width: 560px) {
+  .history-toolbar .history-label { display: none; }
+  .history-toolbar .toolbar-button { width: 40px; padding: 8px; }
+}

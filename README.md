@@ -26,7 +26,8 @@
 - **Arrange it.** Drag the app, Applications folder, text, and arrow in a live Finder-style preview.
 - **Make it yours.** Set exact positions, window size, typography, colors, gradients, and image backgrounds.
 - **Fine-tune it.** Arrow keys move 1 px; Shift+Arrow moves 10 px. Undo/redo spans canvas and controls.
-- **Pick up later.** Your composition and uploads stay on this device, saved in IndexedDB. No API keys needed.
+- **Keep the link.** Composition settings live in the URL through nuqs. Bookmark or share it to reopen the layout. Uploaded images stay on this device in IndexedDB and must be uploaded again on another device.
+- **Start fresh.** Reset returns to the default design and clears its URL settings. Undo can restore the previous composition. Opening the site without design parameters always starts with the default.
 
 ## Export
 
@@ -62,7 +63,7 @@ bun run build
 bun run start
 ```
 
-Built with Next.js, React, DialKit, Zod, and fflate. Editor UI lives in [`components/editor`](components/editor); document state, persistence, artwork, and export adapters live in [`lib/dmgly`](lib/dmgly).
+Built with Next.js, React, nuqs, DialKit, Zod, and fflate. Editor UI lives in [`components/editor`](components/editor); document state, image persistence, artwork, and export adapters live in [`lib/dmgly`](lib/dmgly).
 
 [Product design](docs/plans/2026-09-14-dmg-preview-design.md) · [Packaging contract](docs/research/packaging-contract.md) · [Verification](docs/verification/mvp.md)
 
