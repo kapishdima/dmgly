@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const ICON_SIZE = 128;
-export const TITLEBAR_HEIGHT = 28;
+export const TITLEBAR_HEIGHT = 32;
 const number = (min: number, max: number) => z.number().finite().min(min).max(max);
 const color = z.string().regex(/^#[0-9a-f]{6}$/i);
 const position = z.object({ x: number(0, 1600), y: number(0, 1200) });

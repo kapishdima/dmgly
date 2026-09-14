@@ -21,7 +21,7 @@ test("positions clamp without mutating input", () => {
   const d = createComposition();
   const next = moveElement(d, "app", -300, 9999);
   expect(next.app.x).toBe(72);
-  expect(next.app.y).toBe(276);
+  expect(next.app.y).toBe(272);
   expect(d.app.x).toBe(180);
 });
 test("resizing constrains native icons and snapshot stays isolated", () => {

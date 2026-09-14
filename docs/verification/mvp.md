@@ -44,7 +44,7 @@ All three images mounted read-only with successful checksums. Their Applications
 
 Background SHA-256: `706b312dec082b211ad3342fc6c1f65617db3c4ab287a1041294638658ac25c7`.
 
-All three DMGs were opened in Finder. The artwork and native-item placement agree with the shared composition. Finder supplies system-specific chrome, icons, and labels. On this host its titlebar is approximately 32 px versus the preview's 28 px approximation; native/Tauri labels use 16 pt while electron-builder uses 12 pt. These are declared preview limitations, not settings that Dmgly exports.
+All three DMGs were opened in Finder. The artwork and native-item placement agree with the shared composition. Finder supplies system-specific chrome, icons, and labels. On this host its titlebar is approximately 32 px matching the updated preview's 32 px approximation; native/Tauri labels use 16 pt while electron-builder uses 12 pt. These are declared preview limitations, not settings that Dmgly exports.
 
 ### Window-manager finding
 

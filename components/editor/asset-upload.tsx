@@ -1,4 +1,6 @@
 "use client";
+import { Upload01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
+import { Icon } from "./icon";
 import { useEffect, useRef, useState } from "react";
 import { ImageAsset } from "@/lib/dmgly/model";
 import { readImageAsset } from "@/lib/dmgly/images";
@@ -46,11 +48,12 @@ export function AssetUpload({
           <span className="upload-file">{value.name}</span>
         ) : (
           <>
-            <span className="upload-plus">+</span>
+            <Icon icon={Upload01Icon} size={24} />
             <span>{label}</span>
           </>
         )}
         <input
+          name={label}
           type="file"
           accept="image/png,image/jpeg,image/webp"
           aria-label={label}
@@ -62,10 +65,11 @@ export function AssetUpload({
         />
       </label>
       <span className="upload-hint">
-        {busy ? "Opening image…" : "PNG, JPEG or WebP · up to 10 MB"}
+        {busy ? "Opening image…" : "PNG, JPEG or WebP up to 10 MB"}
       </span>
       {value && (
         <button
+          type="button"
           className="secondary-button"
           onClick={() => {
             revision.current++;
@@ -73,6 +77,7 @@ export function AssetUpload({
             onChange(null);
           }}
         >
+          <Icon icon={Cancel01Icon} size={16} />
           Remove image
         </button>
       )}

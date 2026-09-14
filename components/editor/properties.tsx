@@ -1,8 +1,26 @@
 "use client";
+import { useEffect, useRef } from "react";
+import {
+  Image01Icon,
+  PackageIcon,
+  Folder01Icon,
+  TextIcon,
+  ArrowRight01Icon,
+  Add01Icon,
+  Cancel01Icon,
+  ArrowDown01Icon,
+} from "@hugeicons/core-free-icons";
+import { Icon } from "./icon";
 import { ColorControl, SelectControl, Slider, Toggle, TextControl } from "dialkit";
 import "dialkit/styles.css";
 import { AssetUpload } from "./asset-upload";
-import { Composition, ElementId, moveElement, resizeWindow } from "@/lib/dmgly/model";
+import {
+  Composition,
+  ElementId,
+  moveElement,
+  resizeWindow,
+  TITLEBAR_HEIGHT,
+} from "@/lib/dmgly/model";
 
 export function hexColor(value: string): string {
   const c = document.createElement("canvas").getContext("2d")!;
@@ -31,6 +49,7 @@ export function BackgroundProperties({
       <div className="segment">
         {(["solid", "gradient", "image"] as const).map((mode) => (
           <button
+            type="button"
             key={mode}
             aria-pressed={b.mode === mode}
             className={b.mode === mode ? "active" : ""}
@@ -120,7 +139,7 @@ export function BackgroundProperties({
               onChange={(angle) => update({ gradient: { ...b.gradient, angle } })}
             />
           )}
-          <p className="field-label">COLOR STOPS</p>
+          <p className="field-label">Color stops</p>
           {b.gradient.stops.map((stop, i) => (
             <div className="color-stop" key={stop.id}>
               <ColorControl
@@ -155,6 +174,7 @@ export function BackgroundProperties({
                   }
                 />
                 <button
+                  type="button"
                   className="small-button"
                   aria-label={`Remove color ${i + 1}`}
                   disabled={b.gradient.stops.length <= 2}
@@ -167,12 +187,13 @@ export function BackgroundProperties({
                     })
                   }
                 >
-                  ×
+                  <Icon icon={Cancel01Icon} size={16} />
                 </button>
               </div>
             </div>
           ))}
           <button
+            type="button"
             className="secondary-button"
             disabled={b.gradient.stops.length >= 8}
             onClick={() =>
@@ -187,7 +208,8 @@ export function BackgroundProperties({
               })
             }
           >
-            + Add color stop
+            <Icon icon={Add01Icon} size={16} />
+            Add color stop
           </button>
         </>
       )}
@@ -323,35 +345,48 @@ export function Inspector({
     arrow: "Arrow",
   };
   const native = selected === "app" || selected === "applications";
+  const scroll = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    scroll.current?.scrollTo({ top: 0 });
+  }, [selected]);
+  const icons = {
+    background: Image01Icon,
+    app: PackageIcon,
+    applications: Folder01Icon,
+    text: TextIcon,
+    arrow: ArrowRight01Icon,
+  };
   return (
-    <aside className="inspector">
+    <aside
+      className="inspector"
+      onPointerDownCapture={onBegin}
+      onPointerUpCapture={(e) => {
+        if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement))
+          onEnd?.();
+      }}
+      onPointerCancelCapture={onEnd}
+      onFocusCapture={onBegin}
+      onBlurCapture={onEnd}
+    >
       <div className="inspector-heading">
-        <h2>Make it yours</h2>
-        <span>A few details. All the difference.</span>
+        <h2>Design</h2>
+        <p>Every detail, in its place.</p>
       </div>
       <div className="element-tabs" aria-label="Select element">
         {(Object.keys(labels) as ElementId[]).map((id) => (
           <button
+            type="button"
             key={id}
             className={selected === id ? "active" : ""}
             aria-pressed={selected === id}
             onClick={() => onSelect(id)}
           >
-            {labels[id]}
+            <Icon icon={icons[id]} />
+            <span>{labels[id]}</span>
           </button>
         ))}
       </div>
-      <div
-        className="property-scroll"
-        onPointerDownCapture={onBegin}
-        onPointerUpCapture={(e) => {
-          if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement))
-            onEnd?.();
-        }}
-        onPointerCancelCapture={onEnd}
-        onFocusCapture={onBegin}
-        onBlurCapture={onEnd}
-      >
+      <div ref={scroll} className="property-scroll">
         {selected === "background" && <BackgroundProperties document={d} onChange={onChange} />}
         {selected === "app" && (
           <div className="dialkit-root control-stack" data-theme="light">
@@ -373,7 +408,7 @@ export function Inspector({
         )}
         {selected !== "background" && (
           <div className="dialkit-root control-stack position-controls" data-theme="light">
-            <p className="field-label">POSITION</p>
+            <p className="field-label">Position</p>
             <Slider
               label="X"
               value={d[selected].x}
@@ -386,42 +421,41 @@ export function Inspector({
               label="Y"
               value={d[selected].y}
               min={native ? 72 : 16}
-              max={d.window.height - 28 - (native ? 96 : 16)}
+              max={d.window.height - TITLEBAR_HEIGHT - (native ? 96 : 16)}
               step={1}
               onChange={(y) => onChange(moveElement(d, selected, d[selected].x, y))}
             />
-            {native && (
-              <p className="control-note">Icon size: 128 px · Matches all export formats.</p>
-            )}
+            {native && <p className="control-note">Native icon size is 128 px.</p>}
           </div>
         )}
-        <details className="window-details">
-          <summary>
-            Window size{" "}
-            <span>
-              {d.window.width} × {d.window.height}
-            </span>
-          </summary>
-          <div className="dialkit-root control-stack" data-theme="light">
-            <Slider
-              label="Width"
-              value={d.window.width}
-              min={480}
-              max={1200}
-              step={1}
-              onChange={(width) => onChange(resizeWindow(d, width, d.window.height))}
-            />
-            <Slider
-              label="Height"
-              value={d.window.height}
-              min={320}
-              max={900}
-              step={1}
-              onChange={(height) => onChange(resizeWindow(d, d.window.width, height))}
-            />
-          </div>
-        </details>
       </div>
+      <details className="window-details">
+        <summary>
+          Window size{" "}
+          <span>
+            {d.window.width} × {d.window.height}
+          </span>
+          <Icon icon={ArrowDown01Icon} size={16} />
+        </summary>
+        <div className="dialkit-root control-stack" data-theme="light">
+          <Slider
+            label="Width"
+            value={d.window.width}
+            min={480}
+            max={1200}
+            step={1}
+            onChange={(width) => onChange(resizeWindow(d, width, d.window.height))}
+          />
+          <Slider
+            label="Height"
+            value={d.window.height}
+            min={320}
+            max={900}
+            step={1}
+            onChange={(height) => onChange(resizeWindow(d, d.window.width, height))}
+          />
+        </div>
+      </details>
       {children}
     </aside>
   );

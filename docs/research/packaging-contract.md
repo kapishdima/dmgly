@@ -17,7 +17,7 @@ Research date: 2026-09-14. Host: macOS 26.6.2, Apple command-line tools availabl
 
 Coordinates are integer logical pixels, x right and y down, relative to the icon-view area. Native file icon positions refer to icon centers. They are independent of browser zoom and device pixel ratio. Preview labels are indicative: Finder controls label appearance and actual application icons come from the built .app.
 
-The editor uses a shared 128 px native icon size. Window dimensions passed to the packaging tools are their window bounds; create-dmg and Tauri's AppleScript explicitly set Finder container-window bounds. Finder chrome and the resulting visible content height can vary with macOS. The preview uses a separate 28 px titlebar approximation and labels dimensions as window size. Background exports use the configured width/height, so the image covers the content region. Do not promise pixel-exact chrome or compensate by an unverified constant in one adapter.
+The editor uses a shared 128 px native icon size. Window dimensions passed to the packaging tools are their window bounds; create-dmg and Tauri's AppleScript explicitly set Finder container-window bounds. Finder chrome and the resulting visible content height can vary with macOS. The preview uses a separate 32 px titlebar approximation and labels dimensions as window size. Background exports use the configured width/height, so the image covers the content region. Do not promise pixel-exact chrome or compensate by an unverified constant in one adapter.
 
 ## Asset policy
 

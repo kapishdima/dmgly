@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import {
+  UndoIcon,
+  RedoIcon,
+  CheckmarkCircle02Icon,
+  Cursor01Icon,
+} from "@hugeicons/core-free-icons";
+import { Icon } from "./icon";
 import { ExportDialog } from "./export-dialog";
 import { Inspector } from "./properties";
 import { artworkSvg } from "@/lib/dmgly/artwork";
@@ -28,22 +35,45 @@ export default function Editor() {
   return (
     <div className="dmgly">
       <header className="site-header">
-        <Link className="wordmark" href="/">
-          Dmgly<span>.</span>
+        <Link className="wordmark" href="/" aria-label="Dmgly homepage">
+          Dmgly
         </Link>
-        <span className="header-note">A little care, before the first launch.</span>
+        <p className="header-note">A thoughtful welcome for your Mac app.</p>
       </header>
-      <main>
+      <main className="editor-main">
         <div className="intro">
-          <span className="eyebrow">MAKE YOURSELF AT HOME</span>
-          <h1>A lovely first impression.</h1>
-          <p>Design your DMG. Make the welcome yours.</p>
+          <h1>Make the first impression yours</h1>
+          <p>Arrange your installer, fine-tune the details, and take it into your app.</p>
         </div>
         <div className="workspace" inert={!draft.ready} aria-busy={!draft.ready}>
           <section className="preview-area" aria-label="DMG preview">
-            <div className="preview-caption">
-              <span>YOUR INSTALLER</span>
-              <span>macOS preview</span>
+            <div className="preview-toolbar">
+              <div>
+                <h2>Preview</h2>
+                <p>Your installer, as you make it.</p>
+              </div>
+              <div className="history-toolbar" role="group" aria-label="Edit history">
+                <button
+                  type="button"
+                  className="toolbar-button"
+                  onClick={undo}
+                  disabled={!canUndo}
+                  title="Undo (⌘Z / Ctrl+Z)"
+                >
+                  <Icon icon={UndoIcon} />
+                  Undo
+                </button>
+                <button
+                  type="button"
+                  className="toolbar-button"
+                  onClick={redo}
+                  disabled={!canRedo}
+                  title="Redo (⇧⌘Z / Ctrl+Shift+Z)"
+                >
+                  <Icon icon={RedoIcon} />
+                  Redo
+                </button>
+              </div>
             </div>
             <DmgCanvas
               document={document}
@@ -59,15 +89,10 @@ export default function Editor() {
                 />
               }
             />
-            <div className="history-toolbar">
-              <button onClick={undo} disabled={!canUndo}>
-                ↶ Undo
-              </button>
-              <button onClick={redo} disabled={!canRedo}>
-                ↷ Redo
-              </button>
-            </div>
-            <p className="preview-note">Drag an icon to find its place.</p>
+            <p className="preview-note">
+              <Icon icon={Cursor01Icon} size={16} />
+              Drag to arrange. Use arrow keys for a little precision.
+            </p>
           </section>
           <Inspector
             document={document}
@@ -77,14 +102,25 @@ export default function Editor() {
             onBegin={begin}
             onEnd={end}
           >
-            <p className="inspector-help">{draft.status}</p>
-            <ExportDialog document={document} />
+            <div className="inspector-footer">
+              <p className="save-status" role="status">
+                {draft.status === "Saved on this device" && (
+                  <Icon icon={CheckmarkCircle02Icon} size={16} />
+                )}
+                <span>{draft.status}</span>
+              </p>
+              <ExportDialog document={document} />
+            </div>
           </Inspector>
         </div>
       </main>
-      <footer>
-        <span>Made for the moment before “Open”.</span>
-        <span>Electron · Tauri · macOS</span>
+      <footer className="site-footer">
+        <p>Made for the moment before “Open”.</p>
+        <ul role="list" aria-label="Supported platforms">
+          <li>Electron</li>
+          <li>Tauri</li>
+          <li>Swift</li>
+        </ul>
       </footer>
     </div>
   );

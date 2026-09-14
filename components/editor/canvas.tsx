@@ -3,7 +3,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Folder01Icon } from "@hugeicons/core-free-icons";
+import {
+  CircleIcon,
+  HardDriveIcon,
+  Remove01Icon,
+  Add01Icon,
+  Maximize01Icon,
+  PackageIcon,
+} from "@hugeicons/core-free-icons";
+import { Icon } from "./icon";
 import { textBounds } from "@/lib/dmgly/artwork";
 import { Composition, ElementId, MovableId, moveElement, TITLEBAR_HEIGHT } from "@/lib/dmgly/model";
 
@@ -41,7 +49,7 @@ export function DmgCanvas({
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-  const scale = zoom === "fit" ? Math.min(1, available / d.window.width) : zoom;
+  const scale = zoom === "fit" ? Math.min(1, Math.max(1, available - 96) / d.window.width) : zoom;
   function snap(id: MovableId, x: number, y: number) {
     const xs = [d.window.width / 2],
       ys = [(d.window.height - TITLEBAR_HEIGHT) / 2];
@@ -146,11 +154,14 @@ export function DmgCanvas({
             >
               <div className="finder-title">
                 <span className="traffic-lights" aria-hidden="true">
-                  <i />
-                  <i />
-                  <i />
+                  <HugeiconsIcon icon={CircleIcon} size={12} fill="currentColor" strokeWidth={0} />
+                  <HugeiconsIcon icon={CircleIcon} size={12} fill="currentColor" strokeWidth={0} />
+                  <HugeiconsIcon icon={CircleIcon} size={12} fill="currentColor" strokeWidth={0} />
                 </span>
-                <span>{d.app.name}</span>
+                <span className="finder-name">
+                  <Icon icon={HardDriveIcon} size={15} />
+                  {d.app.name}
+                </span>
               </div>
               <div
                 className="artboard"
@@ -168,9 +179,15 @@ export function DmgCanvas({
                   <>
                     <span className="app-placeholder">
                       {d.app.image ? (
-                        <img src={d.app.image.data} alt="" draggable={false} />
+                        <img
+                          src={d.app.image.data}
+                          alt=""
+                          width={128}
+                          height={128}
+                          draggable={false}
+                        />
                       ) : (
-                        d.app.name.slice(0, 1).toUpperCase()
+                        <Icon icon={PackageIcon} size={54} />
                       )}
                     </span>
                     <span className="icon-label">{d.app.name}</span>
@@ -181,12 +198,13 @@ export function DmgCanvas({
                 {item(
                   "applications",
                   <>
-                    <HugeiconsIcon
-                      icon={Folder01Icon}
-                      size={120}
-                      strokeWidth={1.3}
-                      color="#168cb9"
-                      fill="#8ed8f5"
+                    <img
+                      className="applications-icon"
+                      src="/assets/applications-folder.png"
+                      width={128}
+                      height={128}
+                      alt=""
+                      draggable={false}
                     />
                     <span className="icon-label">Applications</span>
                   </>,
@@ -228,14 +246,27 @@ export function DmgCanvas({
           <span className="toolbar-muted"> px</span>
         </span>
         <div className="zoom-controls">
-          <button aria-label="Zoom out" onClick={() => setZoom(Math.max(0.25, scale - 0.1))}>
-            −
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Zoom out"
+            onClick={() => setZoom(Math.max(0.25, scale - 0.1))}
+          >
+            <Icon icon={Remove01Icon} />
           </button>
           <output>{Math.round(scale * 100)}%</output>
-          <button aria-label="Zoom in" onClick={() => setZoom(Math.min(2, scale + 0.1))}>
-            +
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Zoom in"
+            onClick={() => setZoom(Math.min(2, scale + 0.1))}
+          >
+            <Icon icon={Add01Icon} />
           </button>
-          <button onClick={() => setZoom("fit")}>Fit</button>
+          <button type="button" className="toolbar-button" onClick={() => setZoom("fit")}>
+            <Icon icon={Maximize01Icon} />
+            Fit
+          </button>
         </div>
       </div>
     </>
