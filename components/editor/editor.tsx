@@ -1,13 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import {
   UndoIcon,
   RedoIcon,
   CheckmarkCircle02Icon,
-  NewTwitterIcon,
-  GithubIcon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { ExportDialog } from "./export-dialog";
@@ -35,35 +32,6 @@ export default function Editor() {
   const [selected, setSelected] = useState<ElementId>("background");
   return (
     <div className="dmgly">
-      <header className="site-header">
-        <div className="site-header-inner">
-          <Link className="wordmark" href="/" aria-label="Dmgly homepage">
-            Dmgly
-          </Link>
-          <nav className="header-links" aria-label="Social links">
-            <a
-              className="header-link"
-              href="https://x.com/kapish_dima"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Dima on X"
-              title="X"
-            >
-              <Icon icon={NewTwitterIcon} size={20} />
-            </a>
-            <a
-              className="header-link"
-              href="https://github.com/kapishdima/dmgly"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Dmgly on GitHub"
-              title="GitHub"
-            >
-              <Icon icon={GithubIcon} size={20} />
-            </a>
-          </nav>
-        </div>
-      </header>
       <main className="editor-main">
         <div className="intro">
           <h1>Make the first impression yours</h1>
