@@ -803,8 +803,8 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: var(--z-modal);
-  width: min(720px, calc(100vw - 40px));
-  height: min(740px, calc(100dvh - 48px));
+  width: min(1120px, calc(100vw - 48px));
+  height: min(900px, calc(100dvh - 48px));
   min-height: 0;
   display: grid;
   grid-template-rows: auto auto auto minmax(100px, 1fr) auto auto auto;
