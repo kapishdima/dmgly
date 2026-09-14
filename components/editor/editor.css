@@ -260,6 +260,8 @@
   isolation: isolate;
 }
 .export-platform {
+  position: relative;
+  z-index: 0;
   display: grid;
   place-items: center;
   width: 28px;
