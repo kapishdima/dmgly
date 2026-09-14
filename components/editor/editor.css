@@ -182,7 +182,6 @@
   min-height: 64px;
   gap: 16px;
   padding: 0 0 12px;
-  border-bottom: 1px solid var(--line);
 }
 .preview-toolbar h2 {
   font-size: 16px;
