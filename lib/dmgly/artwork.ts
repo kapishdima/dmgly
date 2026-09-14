@@ -45,8 +45,17 @@ export function arrowPath(d: Composition) {
     r = w / 2;
   if (d.arrow.shape === "chevron")
     return `M ${l} -18 L ${l + 22} 0 L ${l} 18 M ${r - 22} -18 L ${r} 0 L ${r - 22} 18`;
-  if (d.arrow.shape === "curved")
-    return `M ${l} 15 Q 0 -30 ${r} 0 M ${r - 21} -13 L ${r} 0 L ${r - 18} 15`;
+  if (d.arrow.shape === "curved") {
+    // Align the arrowhead with the quadratic curve's tangent at its endpoint.
+    const magnitude = Math.hypot(r, 30),
+      tx = r / magnitude,
+      ty = 30 / magnitude,
+      headLength = Math.min(18, w * 0.3),
+      headRadius = Math.min(12, w * 0.2),
+      baseX = r - tx * headLength,
+      baseY = -ty * headLength;
+    return `M ${l} 15 Q 0 -30 ${r} 0 M ${baseX - ty * headRadius} ${baseY + tx * headRadius} L ${r} 0 L ${baseX + ty * headRadius} ${baseY - tx * headRadius}`;
+  }
   return `M ${l} 0 L ${r} 0 M ${r - 18} -15 L ${r} 0 L ${r - 18} 15`;
 }
 export function textBounds(d: Composition) {
