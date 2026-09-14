@@ -6,7 +6,6 @@ import {
   UndoIcon,
   RedoIcon,
   CheckmarkCircle02Icon,
-  Cursor01Icon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { ExportDialog } from "./export-dialog";
@@ -102,10 +101,6 @@ export default function Editor() {
                 />
               }
             />
-            <p className="preview-note">
-              <Icon icon={Cursor01Icon} size={16} />
-              Drag to arrange. Use arrow keys for a little precision.
-            </p>
           </section>
           <Inspector
             document={document}

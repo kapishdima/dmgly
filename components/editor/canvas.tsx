@@ -10,6 +10,7 @@ import {
   Add01Icon,
   Maximize01Icon,
   PackageIcon,
+  Cursor01Icon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { textBounds } from "@/lib/dmgly/artwork";
@@ -294,6 +295,10 @@ export function DmgCanvas({
           {d.window.width} × {d.window.height}
           <span className="toolbar-muted"> px</span>
         </span>
+        <p className="preview-note">
+          <Icon icon={Cursor01Icon} size={16} />
+          <span>Drag to arrange. Use arrow keys for a little precision.</span>
+        </p>
         <div className="zoom-controls">
           <button
             type="button"
