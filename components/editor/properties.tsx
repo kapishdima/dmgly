@@ -1,5 +1,5 @@
 "use client";
-import { ColorControl, SelectControl, Slider } from "dialkit";
+import { ColorControl, SelectControl, Slider, Toggle, TextControl } from "dialkit";
 import "dialkit/styles.css";
 import { AssetUpload } from "./asset-upload";
 import { Composition } from "@/lib/dmgly/model";
@@ -33,5 +33,25 @@ export function BackgroundProperties({document:d,onChange}:{document:Composition
      </div>)}
      <button className="secondary-button" disabled={b.gradient.stops.length>=8} onClick={()=>update({gradient:{...b.gradient,stops:[...b.gradient.stops,{id:crypto.randomUUID(),color:"#ffffff",at:50}]}})}>+ Add color stop</button>
    </>}
+ </div>;
+}
+
+export function DecorationProperties({document:d,id,onChange}:{document:Composition;id:"text"|"arrow";onChange:(d:Composition)=>void}){
+ const t=d.text,a=d.arrow;
+ return <div className="dialkit-root control-stack" data-theme="light">
+  <Toggle label="Visible" checked={d[id].visible} onChange={visible=>onChange({...d,[id]:{...d[id],visible}})}/>
+  {id==="text" ? <>
+   <TextControl label="Text" value={t.content} onChange={content=>onChange({...d,text:{...t,content:content.slice(0,500)}})}/>
+   <SelectControl label="Font" value={t.font} options={[{value:"sans",label:"Sans serif"},{value:"serif",label:"Serif"},{value:"mono",label:"Monospace"}]} onChange={font=>onChange({...d,text:{...t,font:font as typeof t.font}})}/>
+   <Slider label="Size" min={12} max={64} step={1} value={t.size} onChange={size=>onChange({...d,text:{...t,size}})}/>
+   <ColorControl label="Color" value={t.color} onChange={value=>onChange({...d,text:{...t,color:hexColor(value)}})}/>
+   <SelectControl label="Align" value={t.align} options={["left","center","right"]} onChange={align=>onChange({...d,text:{...t,align:align as typeof t.align}})}/>
+  </> : <>
+   <SelectControl label="Shape" value={a.shape} options={["straight","curved","chevron"]} onChange={shape=>onChange({...d,arrow:{...a,shape:shape as typeof a.shape}})}/>
+   <ColorControl label="Color" value={a.color} onChange={value=>onChange({...d,arrow:{...a,color:hexColor(value)}})}/>
+   <Slider label="Width" value={a.width} min={32} max={240} step={1} onChange={width=>onChange({...d,arrow:{...a,width}})}/>
+   <Slider label="Thickness" value={a.thickness} min={2} max={14} step={1} onChange={thickness=>onChange({...d,arrow:{...a,thickness}})}/>
+   <Slider label="Rotation" value={a.rotation} min={-180} max={180} step={1} unit="°" onChange={rotation=>onChange({...d,arrow:{...a,rotation}})}/>
+  </>}
  </div>;
 }

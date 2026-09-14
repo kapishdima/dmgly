@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Folder01Icon } from "@hugeicons/core-free-icons";
+import { textBounds } from "@/lib/dmgly/artwork";
 import { Composition, ElementId, MovableId, moveElement, TITLEBAR_HEIGHT } from "@/lib/dmgly/model";
 
 export function DmgCanvas({ document: d, selected, onSelect, onChange, onBegin, onEnd, artwork }: {
@@ -40,8 +41,8 @@ export function DmgCanvas({ document: d, selected, onSelect, onChange, onBegin, 
           {artwork || <div className="artwork" style={{background:"linear-gradient(135deg,#ffefd5,#e9a26c)"}} />}
           {item("app",<><span className="app-placeholder">{d.app.image ? <img src={d.app.image.data} alt="" draggable={false}/> : d.app.name.slice(0,1).toUpperCase()}</span><span className="icon-label">{d.app.name}</span></>,"App icon",true)}
           {item("applications",<><HugeiconsIcon icon={Folder01Icon} size={120} strokeWidth={1.3} color="#168cb9" fill="#8ed8f5"/><span className="icon-label">Applications</span></>,"Applications folder",true)}
-          {d.text.visible && item("text",<span style={{fontFamily:"Arial",fontSize:d.text.size,color:d.text.color,whiteSpace:"pre",lineHeight:1.3}}>{d.text.content}</span>,"Instruction text")}
-          {d.arrow.visible && item("arrow",<span style={{fontSize:58,color:d.arrow.color,lineHeight:1}}>→</span>,"Installation arrow")}
+          {d.text.visible && item("text",<span style={{display:"block",width:textBounds(d).width,height:textBounds(d).height}}/>,"Instruction text")}
+          {d.arrow.visible && item("arrow",<span style={{display:"block",width:d.arrow.width+20,height:60,transform:`rotate(${d.arrow.rotation}deg)`}}/>,"Installation arrow")}
           {guides.x !== undefined && <div className="guide guide-x" style={{left:guides.x}}/>}{guides.y !== undefined && <div className="guide guide-y" style={{top:guides.y}}/>}
         </div>
       </div>
