@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ExportDialog } from "./export-dialog";
 import { Inspector } from "./properties";
 import { artworkSvg } from "@/lib/dmgly/artwork";
 import { DmgCanvas } from "./canvas";
@@ -23,7 +24,7 @@ export default function Editor() {
           <DmgCanvas document={document} selected={selected} onSelect={setSelected} onChange={setDocument} onBegin={begin} onEnd={end} artwork={<div className="artwork" dangerouslySetInnerHTML={{__html:artworkSvg(document)}} />} />
           <div className="history-toolbar"><button onClick={undo} disabled={!canUndo}>↶ Undo</button><button onClick={redo} disabled={!canRedo}>↷ Redo</button></div><p className="preview-note">Drag an icon to find its place.</p>
         </section>
-        <Inspector document={document} selected={selected} onSelect={setSelected} onChange={setDocument} onBegin={begin} onEnd={end}><p className="inspector-help">{draft.status}</p><button className="primary-button" disabled>Export design <span>↗</span></button></Inspector>
+        <Inspector document={document} selected={selected} onSelect={setSelected} onChange={setDocument} onBegin={begin} onEnd={end}><p className="inspector-help">{draft.status}</p><ExportDialog document={document}/></Inspector>
       </div>
     </main>
     <footer><span>Made for the moment before “Open”.</span><span>Electron · Tauri · macOS</span></footer>
