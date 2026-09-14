@@ -27,6 +27,7 @@ import {
   type SelectionFrame,
 } from "@/lib/dmgly/transforms";
 import { SelectionHandles } from "./selection-handles";
+import { CanvasRulers } from "./canvas-rulers";
 
 type Gesture = {
   kind: "move" | "scale" | "rotate";
@@ -99,7 +100,7 @@ export function DmgCanvas({
       rotation: d.text.rotation,
     });
   }, [d.text]);
-  const canvasPadding = available < 500 ? 24 : 48;
+  const canvasPadding = available < 500 ? 40 : 48;
   const scale =
     zoom === "fit"
       ? Math.min(1, Math.max(1, available - canvasPadding * 2) / d.window.width)
@@ -359,6 +360,12 @@ export function DmgCanvas({
               height: d.window.height * scale,
             }}
           >
+            <CanvasRulers
+              width={d.window.width}
+              height={d.window.height}
+              zoom={scale}
+              positions={ids.map((id) => d[id])}
+            />
             <div
               className="finder live-finder"
               style={{

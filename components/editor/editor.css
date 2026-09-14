@@ -139,74 +139,6 @@
     linear-gradient(#bcbcb3, #bcbcb3) right center / 1px 7px no-repeat,
     linear-gradient(90deg, #c7c7be, #d9d9d2) center / 100% 1px no-repeat;
 }
-.intro-dimensions {
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  top: 66px;
-  right: 32px;
-  width: clamp(200px, 29%, 380px);
-  height: 150px;
-  color: #8d8d82;
-  font: 400 11px/1.4 var(--font-mono), monospace;
-  font-variant-numeric: tabular-nums;
-}
-.intro-width-rule {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 12px;
-  border-top: 1px solid #d5d5cc;
-  background: repeating-linear-gradient(90deg, #d5d5cc 0 1px, transparent 1px 10px) top / 100% 5px no-repeat;
-}
-.intro-width-rule::before,
-.intro-width-rule::after {
-  content: "";
-  position: absolute;
-  top: -5px;
-  height: 13px;
-  border-left: 1px solid #bdbdb2;
-}
-.intro-width-rule::after { right: 0; }
-.intro-width-rule > span {
-  position: absolute;
-  left: 50%;
-  top: -23px;
-  transform: translateX(-50%);
-}
-.intro-height-rule {
-  position: absolute;
-  inset: 0 0 0 auto;
-  width: 12px;
-  border-right: 1px solid #d5d5cc;
-  background: repeating-linear-gradient(0deg, #d5d5cc 0 1px, transparent 1px 10px) right / 5px 100% no-repeat;
-}
-.intro-height-rule > span {
-  position: absolute;
-  top: 50%;
-  left: 22px;
-  writing-mode: vertical-rl;
-  transform: translateY(-50%);
-}
-.intro-height-rule::after {
-  content: "";
-  position: absolute;
-  right: -5px;
-  bottom: 0;
-  width: 13px;
-  border-bottom: 1px solid #bdbdb2;
-}
-.intro-corner-rule {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 32px;
-  height: 32px;
-  border-left: 1px solid #d5d5cc;
-  border-bottom: 1px solid #d5d5cc;
-}
-@media (max-width: 850px) {
-  .intro-dimensions { display: none; }
-}
 .intro p {
   color: var(--muted);
   font-size: 1.125rem;
@@ -1256,4 +1188,33 @@
   .shortcuts-body { padding: 16px; }
   .shortcuts-dialog .shortcuts-footer { padding: 12px 16px 16px; }
   .shortcut-row { gap: 12px; }
+}
+
+.canvas-ruler {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+  font: 400 10px/1 var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  fill: #828279;
+}
+.canvas-ruler-x {
+  left: 0;
+  top: -38px;
+}
+.canvas-ruler-y {
+  left: -42px;
+}
+.ruler-baseline,
+.ruler-tick {
+  stroke: #c5c5bc;
+  stroke-width: 1;
+}
+.ruler-position {
+  stroke: #555c94;
+  stroke-width: 2;
+}
+.ruler-position-label {
+  fill: #555c94;
+  font-weight: 600;
 }

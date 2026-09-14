@@ -41,11 +41,6 @@ export default function Editor() {
     <div className="dmgly">
       <main className="editor-main">
         <div className="intro">
-          <div className="intro-dimensions" aria-hidden="true">
-            <span className="intro-width-rule"><span>{document.window.width} px</span></span>
-            <span className="intro-height-rule"><span>{document.window.height} px</span></span>
-            <span className="intro-corner-rule" />
-          </div>
           <div className="intro-brand-row">
             <span className="intro-brand">Dmgly</span>
             <nav className="intro-socials" aria-label="Social links">
