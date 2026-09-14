@@ -37,9 +37,6 @@
   cursor: default;
   opacity: 0.4;
 }
-.dmgly button:not(.canvas-object):active:not(:disabled) {
-  scale: 0.96;
-}
 .dmgly :focus-visible {
   outline: 2px solid #65655f;
   outline-offset: 3px;
@@ -699,9 +696,6 @@
   font-variant-numeric: tabular-nums;
   font-weight: 400;
 }
-.window-details[open] summary > svg {
-  rotate: 180deg;
-}
 .window-details > .control-stack {
   padding-bottom: 16px;
 }
@@ -1225,4 +1219,112 @@
 @container (max-width: 560px) {
   .history-toolbar .history-label { display: none; }
   .history-toolbar .toolbar-button { width: 40px; padding: 8px; }
+}
+
+/* Motion is reserved for pointer interactions; canvas edits stay immediate. */
+html[data-dmgly-input="pointer"] .dmgly :is(.primary-button, .secondary-button, .toolbar-button, .icon-button, .small-button, .close-button) {
+  transition: scale 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+html[data-dmgly-input="pointer"] .dmgly :is(.primary-button, .secondary-button, .toolbar-button, .icon-button, .small-button, .close-button):active:not(:disabled) {
+  scale: 0.97;
+}
+.motion-dialog {
+  opacity: 1;
+}
+html[data-dmgly-input="pointer"] .motion-dialog {
+  transition: opacity 200ms cubic-bezier(0.19, 1, 0.22, 1), transform 200ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+.export-dialog.motion-dialog[data-starting-style],
+.export-dialog.motion-dialog[data-ending-style] {
+  opacity: 0;
+  transform: translate(-50%, -50%) translateY(6px) scale(0.98);
+}
+html[data-dmgly-input="pointer"] .motion-dialog[data-ending-style] {
+  transition-duration: 120ms;
+}
+.motion-backdrop {
+  opacity: 1;
+}
+html[data-dmgly-input="pointer"] .motion-backdrop {
+  transition: opacity 200ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+.motion-backdrop[data-starting-style],
+.motion-backdrop[data-ending-style] {
+  opacity: 0;
+}
+html[data-dmgly-input="pointer"] .motion-backdrop[data-ending-style] {
+  transition-duration: 120ms;
+}
+.window-details summary > svg {
+  transform: rotate(0);
+}
+.window-details[open] summary > svg {
+  transform: rotate(180deg);
+}
+html[data-dmgly-input="pointer"] .window-details summary > svg {
+  transition: transform 180ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+html[data-dmgly-input="pointer"] .window-details > .control-stack {
+  opacity: 1;
+  transition: opacity 160ms cubic-bezier(0.19, 1, 0.22, 1);
+  @starting-style { opacity: 0; }
+}
+.copy-feedback {
+  display: grid;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+.copy-feedback > svg {
+  grid-area: 1 / 1;
+}
+.copy-feedback > svg:last-child {
+  opacity: 0;
+  transform: scale(0.85);
+}
+.copy-feedback[data-copied] > svg:first-child {
+  opacity: 0;
+  transform: scale(0.85);
+}
+.copy-feedback[data-copied] > svg:last-child {
+  opacity: 1;
+  transform: scale(1);
+}
+html[data-dmgly-input="pointer"] .copy-feedback > svg {
+  transition: opacity 160ms ease, transform 160ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  html[data-dmgly-input="pointer"] .export-platform {
+    transition: transform 180ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .primary-button:hover .export-platform:first-child { transform: translateX(-3px); }
+  .primary-button:hover .export-platform:last-child { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .export-dialog.motion-dialog[data-starting-style],
+  .export-dialog.motion-dialog[data-ending-style] {
+    transform: translate(-50%, -50%);
+  }
+  html[data-dmgly-input="pointer"] :is(.motion-dialog, .motion-backdrop) {
+    transition: opacity 120ms ease;
+  }
+  .copy-feedback > svg { transform: none !important; }
+  html[data-dmgly-input="pointer"] .copy-feedback > svg,
+  html[data-dmgly-input="pointer"] .window-details > .control-stack {
+    transition: opacity 120ms ease !important;
+  }
+  .primary-button:hover .export-platform { transform: none !important; }
+  .window-details summary > svg { transition: none; }
+}
+html[data-dmgly-input="keyboard"] :is(.motion-dialog, .motion-backdrop),
+html[data-dmgly-input="keyboard"] .dmgly * {
+  transition: none !important;
+  animation: none !important;
+}
+html[data-dmgly-input="keyboard"] .export-dialog.motion-dialog[data-starting-style] {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+html[data-dmgly-input="keyboard"] .motion-backdrop[data-starting-style] {
+  opacity: 1;
 }

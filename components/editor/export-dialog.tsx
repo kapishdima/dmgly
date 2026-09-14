@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import {
   Cancel01Icon,
@@ -7,6 +7,7 @@ import {
   Download01Icon,
   CodeIcon,
   SparklesIcon,
+  CheckmarkCircle02Icon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { PlatformButtons } from "./platform-buttons";
@@ -26,6 +27,13 @@ export function ExportDialog({ document: d }: { document: Composition }) {
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
   const busyRef = useRef(false);
+  const copied =
+    message === "Config copied." || message.startsWith("AI prompt copied.");
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setMessage(""), 1800);
+    return () => clearTimeout(timer);
+  }, [copied, message]);
   const parsed = useMemo(() => compositionSchema.safeParse(d), [d]);
   const output = useMemo(
     () => (parsed.success ? exportText(parsed.data, target) : null),
@@ -95,8 +103,8 @@ export function ExportDialog({ document: d }: { document: Composition }) {
         </span>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Backdrop className="export-backdrop" />
-        <Dialog.Popup className="export-dialog dmgly">
+        <Dialog.Backdrop className="export-backdrop motion-backdrop" />
+        <Dialog.Popup className="export-dialog dmgly motion-dialog">
           <div className="export-heading">
             <div>
               <Dialog.Title>Export your design</Dialog.Title>
@@ -198,7 +206,14 @@ export function ExportDialog({ document: d }: { document: Composition }) {
               disabled={!!error || busy}
               onClick={copy}
             >
-              <Icon icon={Copy01Icon} />
+              <span
+                className="copy-feedback"
+                data-copied={copied || undefined}
+                aria-hidden="true"
+              >
+                <Icon icon={Copy01Icon} />
+                <Icon icon={CheckmarkCircle02Icon} />
+              </span>
               {tab === "config" ? "Copy config" : "Copy AI prompt"}
             </button>
             <button
@@ -211,7 +226,9 @@ export function ExportDialog({ document: d }: { document: Composition }) {
               {busy ? "Preparing files…" : "Download ZIP"}
             </button>
           </div>
-
+          <span className="sr-only" role="status">
+            {message}
+          </span>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

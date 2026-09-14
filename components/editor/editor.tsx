@@ -17,11 +17,13 @@ import { artworkSvg } from "@/lib/dmgly/artwork";
 import { DmgCanvas } from "./canvas";
 import { useDesignUrl } from "./use-design-url";
 import { useComposition } from "./use-composition";
+import { useInputModality } from "./use-input-modality";
 import { ElementId, createComposition } from "@/lib/dmgly/model";
 import { selectElement } from "@/lib/dmgly/transforms";
 import "./editor.css";
 
 export default function Editor() {
+  useInputModality();
   const {
     document,
     edit: setDocument,
