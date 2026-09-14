@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AssetUpload } from "./asset-upload";
 import { BackgroundProperties } from "./properties";
 import { backgroundSvg } from "@/lib/dmgly/artwork";
 import { DmgCanvas } from "./canvas";
@@ -20,7 +21,7 @@ export default function Editor() {
           <DmgCanvas document={document} selected={selected} onSelect={setSelected} onChange={setDocument} artwork={<div className="artwork" dangerouslySetInnerHTML={{__html:backgroundSvg(document)}} />} />
           <p className="preview-note">A small window. A warm welcome.</p>
         </section>
-        <aside className="inspector"><div className="inspector-heading"><h2>Make it yours</h2><span>Background</span></div><BackgroundProperties document={document} onChange={setDocument}/><p className="inspector-help">Your design stays in your browser.</p><button className="primary-button" disabled>Export design <span>↗</span></button></aside>
+        <aside className="inspector"><div className="inspector-heading"><h2>Make it yours</h2><span>Background</span></div><div className="element-tabs">{(["background","app","applications","text","arrow"] as const).map(id=><button key={id} className={selected===id?"active":""} aria-pressed={selected===id} onClick={()=>setSelected(id)}>{id==="applications"?"Folder":id[0].toUpperCase()+id.slice(1)}</button>)}</div>{selected==="app"?<AssetUpload label="Upload app icon" value={document.app.image} onChange={image=>setDocument({...document,app:{...document.app,image}})}/>:<BackgroundProperties document={document} onChange={setDocument}/>}<p className="inspector-help">Your design stays in your browser.</p><button className="primary-button" disabled>Export design <span>↗</span></button></aside>
       </div>
     </main>
     <footer><span>Made for the moment before “Open”.</span><span>Electron · Tauri · macOS</span></footer>

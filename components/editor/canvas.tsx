@@ -38,7 +38,7 @@ export function DmgCanvas({ document: d, selected, onSelect, onChange, onBegin, 
         <div className="finder-title"><span className="traffic-lights" aria-hidden="true"><i/><i/><i/></span><span>{d.app.name}</span></div>
         <div className="artboard" style={{ height:d.window.height-TITLEBAR_HEIGHT }} onClick={() => onSelect("background")}>
           {artwork || <div className="artwork" style={{background:"linear-gradient(135deg,#ffefd5,#e9a26c)"}} />}
-          {item("app",<><span className="app-placeholder">{d.app.name.slice(0,1).toUpperCase()}</span><span className="icon-label">{d.app.name}</span></>,"App icon",true)}
+          {item("app",<><span className="app-placeholder">{d.app.image ? <img src={d.app.image.data} alt="" draggable={false}/> : d.app.name.slice(0,1).toUpperCase()}</span><span className="icon-label">{d.app.name}</span></>,"App icon",true)}
           {item("applications",<><HugeiconsIcon icon={Folder01Icon} size={120} strokeWidth={1.3} color="#168cb9" fill="#8ed8f5"/><span className="icon-label">Applications</span></>,"Applications folder",true)}
           {d.text.visible && item("text",<span style={{fontFamily:"Arial",fontSize:d.text.size,color:d.text.color,whiteSpace:"pre",lineHeight:1.3}}>{d.text.content}</span>,"Instruction text")}
           {d.arrow.visible && item("arrow",<span style={{fontSize:58,color:d.arrow.color,lineHeight:1}}>→</span>,"Installation arrow")}
