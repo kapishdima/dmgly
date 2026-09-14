@@ -62,7 +62,7 @@ export function Inspector({document:d,selected,onSelect,onChange,onBegin,onEnd,c
  return <aside className="inspector">
   <div className="inspector-heading"><h2>Make it yours</h2><span>A few details. All the difference.</span></div>
   <div className="element-tabs" aria-label="Select element">{(Object.keys(labels) as ElementId[]).map(id=><button key={id} className={selected===id?"active":""} aria-pressed={selected===id} onClick={()=>onSelect(id)}>{labels[id]}</button>)}</div>
-  <div className="property-scroll" onPointerDownCapture={onBegin} onPointerUpCapture={onEnd} onPointerCancelCapture={onEnd} onFocusCapture={onBegin} onBlurCapture={onEnd}>
+  <div className="property-scroll" onPointerDownCapture={onBegin} onPointerUpCapture={e=>{if(!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement))onEnd?.();}} onPointerCancelCapture={onEnd} onFocusCapture={onBegin} onBlurCapture={onEnd}>
    {selected==="background"&&<BackgroundProperties document={d} onChange={onChange}/>}
    {selected==="app"&&<div className="dialkit-root control-stack" data-theme="light"><TextControl label="App name" value={d.app.name} onChange={name=>onChange({...d,app:{...d.app,name:name.slice(0,80)}})}/><AssetUpload label="Upload app icon" value={d.app.image} onChange={image=>onChange({...d,app:{...d.app,image}})}/><p className="control-note">Use the same icon as your built app.</p></div>}
    {(selected==="text"||selected==="arrow")&&<DecorationProperties document={d} id={selected} onChange={onChange}/>}
