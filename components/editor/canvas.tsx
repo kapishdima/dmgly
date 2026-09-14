@@ -107,7 +107,7 @@ export function DmgCanvas({
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       const target = e.target;
-      if (window.document.querySelector(".export-dialog")) return;
+      if (window.document.querySelector('[role="dialog"]')) return;
       if (
         !(target instanceof HTMLElement) ||
         target.closest(

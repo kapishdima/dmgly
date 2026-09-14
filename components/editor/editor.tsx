@@ -10,6 +10,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { ExportDialog } from "./export-dialog";
+import { ShortcutsDialog } from "./shortcuts-dialog";
 import { Inspector } from "./properties";
 import { artworkSvg } from "@/lib/dmgly/artwork";
 import { DmgCanvas } from "./canvas";
@@ -86,7 +87,7 @@ export default function Editor() {
               <div
                 className="history-toolbar"
                 role="group"
-                aria-label="Edit history"
+                aria-label="Preview actions"
               >
                 <button
                   type="button"
@@ -108,6 +109,7 @@ export default function Editor() {
                   <Icon icon={RedoIcon} />
                   Redo
                 </button>
+                <ShortcutsDialog />
               </div>
             </div>
             <DmgCanvas

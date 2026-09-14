@@ -1073,3 +1073,104 @@
     height: 76px;
   }
 }
+
+.shortcuts-dialog.dmgly {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-modal);
+  width: min(560px, calc(100vw - 24px));
+  min-height: 0;
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--editor-radius);
+  box-shadow: 0 0 0 1px var(--line), 0 24px 80px -16px rgb(0 0 0 / 25%);
+  overflow: hidden;
+}
+.shortcuts-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 24px 20px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--line);
+}
+.shortcuts-heading h2 {
+  font-size: 22px;
+  font-weight: 600;
+}
+.shortcuts-heading p,
+.shortcuts-hint,
+.shortcuts-footer {
+  font-size: 13px;
+  color: var(--muted);
+}
+.shortcuts-heading p {
+  margin-top: 4px;
+}
+.shortcuts-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+.shortcuts-body section + section {
+  margin-top: 24px;
+}
+.shortcuts-body h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.shortcuts-body dl {
+  margin: 0;
+}
+.shortcuts-body .shortcuts-hint {
+  margin: -4px 0 8px;
+}
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 36px;
+  padding-block: 4px;
+}
+.shortcut-row dt {
+  font-size: 13px;
+}
+.shortcut-row dd {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin: 0;
+  flex-shrink: 0;
+}
+.shortcut-row kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  min-height: 26px;
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+  box-shadow: 0 1px 0 var(--line);
+  font: 500 12px/1.4 var(--font-sans), sans-serif;
+  white-space: nowrap;
+}
+.shortcuts-dialog .shortcuts-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--line);
+  padding: 16px 24px 20px;
+}
+@media (max-width: 480px) {
+  .shortcuts-heading { padding: 20px 16px 16px; }
+  .shortcuts-body { padding: 16px; }
+  .shortcuts-dialog .shortcuts-footer { padding: 12px 16px 16px; }
+  .shortcut-row { gap: 12px; }
+}

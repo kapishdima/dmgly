@@ -14,6 +14,7 @@ export function useComposition() {
     redo = useCallback(() => dispatch({ type: "redo" }), []);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
+      if (document.querySelector('[role="dialog"]')) return;
       const target = e.target as HTMLElement;
       if (target.closest('input,textarea,[contenteditable="true"]')) return;
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") {
