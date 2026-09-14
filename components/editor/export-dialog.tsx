@@ -9,7 +9,7 @@ import {
   SparklesIcon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
-import { PlatformSelect } from "./platform-select";
+import { PlatformButtons } from "./platform-buttons";
 import { CodePreview } from "./code-preview";
 import { Dialog } from "@base-ui/react/dialog";
 import { Composition, compositionSchema } from "@/lib/dmgly/model";
@@ -108,33 +108,35 @@ export function ExportDialog({ document: d }: { document: Composition }) {
               <Icon icon={Cancel01Icon} />
             </Dialog.Close>
           </div>
-          <PlatformSelect
-            value={target}
-            disabled={busy}
-            onChange={(value) => {
-              setTarget(value);
-              setMessage("");
-            }}
-          />
-          <div className="segment export-tabs">
-            {(["config", "prompt"] as const).map((value) => (
-              <button
-                type="button"
-                key={value}
-                aria-pressed={tab === value}
-                className={tab === value ? "active" : ""}
-                onClick={() => {
-                  setTab(value);
-                  setMessage("");
-                }}
-              >
-                <Icon
-                  icon={value === "config" ? CodeIcon : SparklesIcon}
-                  size={16}
-                />
-                {value === "config" ? "Configuration" : "AI prompt"}
-              </button>
-            ))}
+          <div className="export-controls">
+            <PlatformButtons
+              value={target}
+              disabled={busy}
+              onChange={(value) => {
+                setTarget(value);
+                setMessage("");
+              }}
+            />
+            <div className="segment export-tabs">
+              {(["config", "prompt"] as const).map((value) => (
+                <button
+                  type="button"
+                  key={value}
+                  aria-pressed={tab === value}
+                  className={tab === value ? "active" : ""}
+                  onClick={() => {
+                    setTab(value);
+                    setMessage("");
+                  }}
+                >
+                  <Icon
+                    icon={value === "config" ? CodeIcon : SparklesIcon}
+                    size={16}
+                  />
+                  {value === "config" ? "Configuration" : "AI prompt"}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="code-frame">
             <div className="code-heading">
