@@ -16,9 +16,9 @@ Other interface icons use the existing Hugeicons package. Editable installation 
 
 ## Default background
 
-The user-supplied `Dithering@2x (2).png` (1600 × 1200, 81,804 bytes) is embedded without modifying its bytes in `lib/dmgly/default-background.json`. New compositions start in Image mode with this self-contained asset, so initial rendering and SVG-to-PNG export do not wait for an external image request. Default text and arrows use white; image-background icon labels receive a light backing for readability.
+The user-supplied `Dithering@2x (3).png` (1600 × 1200, 81,800 bytes) is embedded without modifying its bytes in `lib/dmgly/default-background.json`. New compositions start in Image mode with this self-contained asset, so initial rendering and SVG-to-PNG export do not wait for an external image request. Default text and arrows use white; image-background icon labels receive a light backing for readability.
 
-Restoring the exact old, untouched gradient starter or either previous image starter upgrades it to the new default. Previous PNGs are identified by their SHA-256 digests. Customized drafts are preserved. Browser reload verified the new image and the selected Image mode; the default composition successfully downloaded as an export ZIP. Regression tests cover embedded artwork and legacy draft migration, including schema-normalized property order.
+Restoring the exact old, untouched gradient starter or any previous image starter upgrades it to the new default. Previous PNGs are identified by their SHA-256 digests. Customized drafts are preserved. Browser reload verified the new image and the selected Image mode; the default composition successfully downloaded as an export ZIP. Regression tests cover embedded artwork and legacy draft migration, including schema-normalized property order.
 
 ## Export and validation
 
@@ -37,3 +37,5 @@ The main editor now uses the joined Studio workspace in the existing light palet
 The installed `base-luma` Button and Card use `rounded-4xl`. Editor surfaces and buttons reference that token (26 px with the current root radius), while nested controls use the corresponding inner radius. The workspace adds its 8 px inset to the panel radius for concentric corners. Finder artwork retains its native geometry.
 
 Background has at least 96 px at normal widths. Below 360 px the element tabs use two rows. Browser checks at 1280, 390, and 320 px confirmed no page overflow and no clipped tab labels. Switching Background to App preserved the inspector footer bounds. The export dialog remains usable at 320 px. ESLint and production build, including TypeScript, passed.
+
+The latest supplied PNG has fully opaque pixels (alpha 255 throughout), eliminating the pale appearance caused by the previous PNG’s 60% opacity.

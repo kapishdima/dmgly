@@ -14,7 +14,7 @@ export async function upgradeStarterDraft(draft: Composition): Promise<Compositi
 
   const image = draft.background.image;
   if (
-    image && ["Dithering@2x.png", "Dithering@2x (1).png"].includes(image.name) &&
+    image && ["Dithering@2x.png", "Dithering@2x (1).png", "Dithering@2x (2).png"].includes(image.name) &&
     image.width === 1600 && image.height === 1200 &&
     serialized === JSON.stringify(parseComposition({
       ...current,
@@ -28,6 +28,7 @@ export async function upgradeStarterDraft(draft: Composition): Promise<Compositi
     if ([
       "445edda6c0135328bf0611cb4a598e1297f2c87c7b9efb50aca9d36efb9b3cfb",
       "d5638fc5dcc097164df5cfd49e4721e670d69a02540f68e09bff47f3f3fe118b",
+      "b6d44aee313564e203b11ed9a936486eec40b171a72b167e2b19be3016210a13",
     ].includes(hash)) return current;
   }
   return draft;
