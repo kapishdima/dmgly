@@ -72,13 +72,16 @@ export function DmgCanvas({
   const [textFrame, setTextFrame] = useState<SelectionFrame | null>(null);
   const ids = visibleElements(d).filter((id) => selected.includes(id));
   const frame = transformFrame ?? selectionFrame(d, ids, textFrame);
-  const [available, setAvailable] = useState(660);
+  const [available, setAvailable] = useState({ width: 660, height: 520 });
   const [zoom, setZoom] = useState<number | "fit">("fit");
   const [guides, setGuides] = useState<{ x?: number; y?: number }>({});
   useEffect(() => {
     const el = host.current!;
-    const observer = new ResizeObserver((entries) =>
-      setAvailable(entries[0].contentRect.width),
+    const observer = new ResizeObserver(([entry]) =>
+      setAvailable({
+        width: entry.contentRect.width,
+        height: entry.contentRect.height,
+      }),
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -100,10 +103,20 @@ export function DmgCanvas({
       rotation: d.text.rotation,
     });
   }, [d.text]);
-  const canvasPadding = available < 500 ? 40 : 48;
+  const canvasPadding = { top: 40, right: 24, bottom: 24, left: 44 };
   const scale =
     zoom === "fit"
-      ? Math.min(1, Math.max(1, available - canvasPadding * 2) / d.window.width)
+      ? Math.min(
+          2,
+          Math.max(
+            1,
+            available.width - canvasPadding.left - canvasPadding.right,
+          ) / d.window.width,
+          Math.max(
+            1,
+            available.height - canvasPadding.top - canvasPadding.bottom,
+          ) / d.window.height,
+        )
       : zoom;
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
@@ -352,7 +365,12 @@ export function DmgCanvas({
         onKeyUp={finishKeyboard}
         onBlur={finishKeyboard}
       >
-        <div className="canvas-scroll" style={{ padding: canvasPadding }}>
+        <div
+          className="canvas-scroll"
+          style={{
+            padding: `${canvasPadding.top}px ${canvasPadding.right}px ${canvasPadding.bottom}px ${canvasPadding.left}px`,
+          }}
+        >
           <div
             className="canvas-size"
             style={{
