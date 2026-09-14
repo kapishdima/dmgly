@@ -397,10 +397,10 @@ export function Inspector({
             />
             <AssetUpload
               label="Upload app icon"
+              description="Use the same icon as your built app."
               value={d.app.image}
               onChange={(image) => onChange({ ...d, app: { ...d.app, image } })}
             />
-            <p className="control-note">Use the same icon as your built app.</p>
           </div>
         )}
         {(selected === "text" || selected === "arrow") && (

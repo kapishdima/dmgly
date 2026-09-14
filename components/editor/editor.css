@@ -634,8 +634,8 @@
   justify-content: center;
   gap: 10px;
   position: relative;
-  min-height: 116px;
-  padding: 16px;
+  min-height: 168px;
+  padding: 20px 16px;
   border: 1px dashed rgb(0 0 0 / 18%);
   border-radius: var(--editor-radius);
   cursor: pointer;
@@ -659,6 +659,12 @@
 .upload-file {
   overflow-wrap: anywhere;
   max-width: 100%;
+  text-align: center;
+}
+.upload-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   text-align: center;
 }
 .upload-hint {

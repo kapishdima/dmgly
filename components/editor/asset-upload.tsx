@@ -1,18 +1,21 @@
 "use client";
 import { Upload01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ImageAsset } from "@/lib/dmgly/model";
 import { readImageAsset } from "@/lib/dmgly/images";
 export function AssetUpload({
   label,
+  description,
   value,
   onChange,
 }: {
   label: string;
+  description?: string;
   value: ImageAsset | null;
   onChange: (value: ImageAsset | null) => void;
 }) {
+  const hintId = useId();
   const callback = useRef(onChange);
   useEffect(() => {
     callback.current = onChange;
@@ -52,11 +55,18 @@ export function AssetUpload({
             <span>{label}</span>
           </>
         )}
+        <span className="upload-details" id={hintId}>
+          <span className="upload-hint">
+            {busy ? "Opening image…" : "PNG, JPEG or WebP up to 10 MB"}
+          </span>
+          {description && <span className="upload-hint">{description}</span>}
+        </span>
         <input
           name={label}
           type="file"
           accept="image/png,image/jpeg,image/webp"
           aria-label={label}
+          aria-describedby={hintId}
           disabled={busy}
           onChange={(e) => {
             void upload(e.currentTarget.files?.[0]);
@@ -64,9 +74,6 @@ export function AssetUpload({
           }}
         />
       </label>
-      <span className="upload-hint">
-        {busy ? "Opening image…" : "PNG, JPEG or WebP up to 10 MB"}
-      </span>
       {value && (
         <button
           type="button"
