@@ -13,7 +13,7 @@ function Ruler({
 }) {
   const step =
     [50, 100, 200, 500, 1000].find((value) => value * zoom >= 60) ?? 1000;
-  const minor = step / 5;
+  const minor = step / 2;
   const ticks = Array.from(
     { length: Math.floor(length / minor) + 1 },
     (_, i) => i * minor,
@@ -26,12 +26,7 @@ function Ruler({
         .slice(0, i)
         .some((previous) => (value - previous) * zoom < labelGap),
   );
-  const labels = [
-    ...ticks.filter(
-      (value) => value % step === 0 && (length - value) * zoom > labelGap,
-    ),
-    length,
-  ];
+  const labels = [0, length];
   const size = length * zoom;
 
   return (
@@ -51,7 +46,7 @@ function Ruler({
       />
       {[...ticks, ...(ticks.includes(length) ? [] : [length])].map((value) => {
         const at = value * zoom;
-        const tick = value % step === 0 || value === length ? 8 : 4;
+        const tick = value % step === 0 || value === length ? 5 : 2;
         return (
           <line
             key={value}

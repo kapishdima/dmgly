@@ -1196,7 +1196,7 @@
   pointer-events: none;
   font: 400 10px/1 var(--font-mono), monospace;
   font-variant-numeric: tabular-nums;
-  fill: #828279;
+  fill: #9b9b91;
 }
 .canvas-ruler-x {
   left: 0;
@@ -1205,16 +1205,19 @@
 .canvas-ruler-y {
   left: -42px;
 }
-.ruler-baseline,
+.ruler-baseline {
+  stroke: #ddddd5;
+  stroke-width: 1;
+}
 .ruler-tick {
-  stroke: #c5c5bc;
+  stroke: #d1d1c8;
   stroke-width: 1;
 }
 .ruler-position {
-  stroke: #555c94;
-  stroke-width: 2;
+  stroke: #939389;
+  stroke-width: 1;
 }
 .ruler-position-label {
-  fill: #555c94;
-  font-weight: 600;
+  fill: #73736c;
+  font-weight: 400;
 }
