@@ -101,6 +101,14 @@ ImageControl accepts local images up to 10 MB and returns a data URL. Asset pers
 
 Sources: [README](https://github.com/joshpuckett/dialkit), [API and individual controls](https://github.com/joshpuckett/dialkit/blob/main/docs/reference.md#custom-layouts). This assessment is based on documentation and the demo; integration in this project has not yet been tested.
 
+## Branding status
+
+Logo exploration is deferred. All five initial generated concepts were rejected; none is approved. Use a plain Dmgly text wordmark until branding is revisited. Logo selection does not block MVP implementation.
+
+## Delivery tracking
+
+Work is tracked in the [Dmgly Linear project](https://linear.app/remocn/project/dmgly-8ec94346a7b0) with an attached [MVP specification](https://linear.app/remocn/document/dmgly-mvp-product-and-design-specification-e1405119a9aa). See [the issue index](2026-09-14-dmgly-linear-plan.md) for milestones and dependencies.
+
 ## Packaging references
 
 - [electron-builder DMG](https://www.electron.build/dmg/)
