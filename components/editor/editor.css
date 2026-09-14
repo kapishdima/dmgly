@@ -81,6 +81,7 @@
   padding-bottom: 36px;
 }
 .intro h1 {
+  max-width: 20ch;
   font-size: clamp(32px, 4vw, 52px);
   line-height: 1.12;
   font-weight: 500;
@@ -90,7 +91,8 @@
   color: var(--muted);
   font-size: clamp(18px, 2vw, 20px);
   line-height: 1.5;
-  max-width: 65ch;
+  max-width: 38ch;
+  text-wrap: balance;
 }
 .workspace {
   display: grid;
