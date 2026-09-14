@@ -1,99 +1,105 @@
-# DMG Preview — согласованный MVP
+# DMG Preview — agreed MVP
 
-Статус: состав MVP и направление светлого редактора на главной согласованы; рассматривается DialKit для панели свойств.
+Status: MVP scope, a light homepage editor, and AI prompt export are agreed. DialKit is being evaluated for the properties panel.
 
-## Задача
+## Language
 
-Веб-приложение для свободной настройки композиции окна установки macOS DMG. Пользователь редактирует оформление непосредственно в превью и получает ресурсы и настройки для своего инструмента упаковки.
+All product copy and project documentation must be in English: navigation, labels, tooltips, placeholders, default canvas text, empty states, errors, export instructions, generated comments, AI prompts, and bundled documentation. The MVP has no language selector.
 
-## Редактор
+Preserve user-authored app names, filenames, and canvas text exactly as entered, including content in other languages. The English requirement applies to product-authored content.
 
-- Один рабочий экран с превью окна Finder, элементами композиции и панелью свойств выбранного элемента.
-- Настройка размера окна и масштаба превью.
-- Приложение и Applications свободно перемещаются; доступны точные координаты и направляющие выравнивания.
-- Загрузка иконки приложения и настройка названия. Иконка в превью должна соответствовать иконке собранного приложения; экспорт объясняет её подключение.
-- Один фон с переключением между solid, gradient и image.
-- Solid: выбор цвета и HEX.
-- Gradient: линейный или радиальный градиент, цвета и точки перехода, угол линейного градиента.
-- Image: загрузка, вписывание или заполнение, масштаб и положение.
-- Редактируемый текст: содержание, небольшой набор шрифтов, размер, цвет, выравнивание и положение.
-- Стрелка: несколько форм, цвет, толщина, размер, поворот и положение.
-- Текст и стрелка имеют независимые переключатели видимости. Выключение сохраняет свойства, но исключает элемент из превью и итогового фона.
-- Отмена и повтор действий; автоматическое сохранение черновика в браузере.
+## Purpose
 
-## Экспорт
+A web application for freely composing a macOS DMG installation window. Users edit directly in the preview and receive assets and settings for their packaging tool.
 
-Все три направления входят в MVP:
+## Editor
 
-| Направление | Результат |
+- One workspace with a Finder window preview and properties for the selected element.
+- Adjustable window dimensions and preview zoom.
+- Freely positioned app and Applications icons, exact coordinates, and alignment guides.
+- App icon upload and app name editing. The preview icon must match the built app icon; export instructions explain how to connect it.
+- One background with Solid, Gradient, and Image modes.
+- Solid: color picker and HEX input.
+- Gradient: linear or radial, colors and stops, and a linear gradient angle.
+- Image: upload, fit or fill, scale, and position.
+- Editable text: content, a small font selection, size, color, alignment, and position.
+- Arrow: several shapes, color, thickness, size, rotation, and position.
+- Independent visibility toggles for text and arrow. Hiding preserves properties while excluding the element from the preview and exported background.
+- Undo, redo, and automatic draft saving in the browser.
+
+## Export
+
+All three targets are included in the MVP:
+
+| Target | Output |
 | --- | --- |
-| Electron / electron-builder | Фрагмент конфигурации dmg |
-| Tauri | Фрагмент bundle.macOS.dmg для tauri.conf.json |
-| Swift / macOS / create-dmg | Скрипт упаковки готового .app |
+| Electron / electron-builder | A dmg configuration fragment |
+| Tauri | A bundle.macOS.dmg fragment for tauri.conf.json |
+| Swift / macOS / create-dmg | A script that packages an existing .app |
 
-Окно экспорта предлагает Copy config и Download ZIP. Архив содержит готовое изображение фона, соответствующий конфиг или скрипт и инструкцию по размещению файлов и применению настроек. Имена и пути ресурсов согласованы с конфигом.
+The export dialog offers Config and AI prompt tabs for the selected target, with Copy config, Copy AI prompt, and Download ZIP actions. The archive includes the rendered background, the corresponding configuration or script, setup instructions, and apply-dmg-prompt.md. Resource names and paths match the generated configuration.
 
-Видимые текст и стрелка включаются в фон. Приложение и Applications остаются объектами DMG: их координаты экспортируются отдельно. Рамка Finder, выделение и направляющие в фон не включаются.
+Visible text and arrows are baked into the background. The app and Applications remain DMG objects with separately exported coordinates. Finder chrome, selection outlines, and alignment guides are excluded from the background.
 
-## Передача настроек AI-агенту
+## AI prompt export
 
-Пользователь предложил выдавать промпт, описывающий применение выбранных настроек DMG. Предлагаемый сценарий: выбрать сборщик в Export, скачать ресурсы, скопировать AI prompt и передать его агенту, работающему с репозиторием приложения.
+Users select a packaging target, download the assets, and give the generated English prompt to an agent working in their application repository. The prompt must accompany the extracted assets or a path accessible to the agent: copying text does not transfer files.
 
-В окне экспорта предлагаются вкладки Config и AI prompt для одного выбранного сборщика. Основные действия: Copy config / Copy AI prompt и Download ZIP. В архив включается apply-dmg-prompt.md с той же инструкцией. Рядом с промптом объясняется, что его нужно передать агенту вместе с распакованными ресурсами или доступным агенту путём к ним: копирование текста само по себе не передаёт файлы.
+Generate the prompt deterministically from the same composition snapshot and export adapter output. This feature does not require an AI API call. Include:
 
-Промпт формируется детерминированно из той же модели композиции и результата адаптера экспорта. Для генерации такого текста не требуется вызов AI API. Он содержит:
+- The target packaging tool and the task of integrating the design into an existing project.
+- Exact dimensions, object positions, and the full generated configuration fragment or script.
+- A manifest of actual exported assets and their relative paths.
+- An explanation that visible decorative elements are already baked into the background.
+- Instructions to inspect the existing configuration and installed tool version, and report a target mismatch instead of automatically migrating the project.
+- Instructions to merge appearance settings while preserving other build, signing, notarization, and update settings.
+- Asset and configuration checks, available macOS build verification, and a report of checks actually performed.
 
-- Целевой сборщик и задачу интеграции оформления в существующий проект.
-- Точные размеры, положения объектов и готовый фрагмент конфигурации либо скрипт.
-- Перечень реально экспортированных ресурсов и их относительные пути.
-- Пояснение, что видимые декоративные элементы уже включены в фон.
-- Указание найти существующую конфигурацию и учесть установленную версию инструмента; различие выбранного сборщика и проекта нужно сообщить, а не автоматически мигрировать проект.
-- Указание объединить настройки оформления с текущей конфигурацией, сохранив остальные параметры сборки, подписи, notarization и обновлений.
-- Проверку наличия ресурсов и корректности конфигурации, доступную проверку сборки на macOS и отчёт о реально выполненных проверках.
+Represent user-authored text and filenames as clearly delimited, escaped data. Identify missing assets and unsupported settings explicitly. Do not promise automatic asset transfer or guaranteed outcomes from a third-party agent.
 
-Содержимое пользовательского текста и имена файлов передаются как явно выделенные данные с корректным экранированием. Отсутствующие файлы или неподдерживаемые параметры должны быть обозначены явно. Промпт не должен обещать автоматическую передачу ресурсов или гарантированный результат работы стороннего агента.
+Validate that the prompt, configuration, and ZIP describe the same composition snapshot and update together. Cover hidden text and arrows, special characters in names, preservation of user-authored language, and references to actual exported resources.
 
-Критерий проверки генератора: промпт, конфиг и ZIP соответствуют одному снимку композиции; после изменения настроек они обновляются согласованно. Отдельно проверяются скрытые текст/стрелка, специальные символы в именах и отсутствие ссылок на несуществующие ресурсы.
+Suggested helper text: "Give your AI agent this prompt and the downloaded assets."
 
-## Устройство и проверка
+## Architecture and verification
 
-Единая модель композиции служит источником для превью, генерации фона и отдельных адаптеров экспорта. Превью приближает отображение Finder; поддерживаемые настройки должны воспроизводиться выбранным сборщиком.
+A single composition model drives the preview, background rendering, and individual export adapters. The preview approximates Finder; each exposed setting must be reproducible by the selected packaging tool.
 
-Проверка результата включает сборку примера каждым из трёх инструментов на macOS и сравнение с превью в Finder. Дополнительно проверяются координаты при изменении масштаба, исключение скрытых элементов из фона и соответствие путей экспортированным файлам.
+Verify an example built with each of the three tools on macOS and compare its Finder appearance with the preview. Also verify coordinate handling at different zoom levels, hidden-element exclusion, and agreement between resource paths and exported files.
 
-## Предстоит проработать
+## Open design details
 
-- Визуальный стиль, компоновку панелей и начальную композицию.
-- Матрицу возможностей сборщиков, включая ограничения размера иконок и поддержку Retina-фонов.
-- Поддерживаемые форматы загрузки иконок и изображений.
-- Обработку ошибок загрузки, сохранения и экспорта.
+- Detailed panel layout, controls, and initial composition.
+- Packaging-tool capability matrix, including icon-size limits and Retina backgrounds.
+- Supported icon and image upload formats.
+- Upload, persistence, and export error handling.
 
-## Визуальные референсы
+## Visual references
 
-Пользователь выбрал два сайта как ориентиры стиля:
+The user selected two style references:
 
-- [Keeby](https://getkeeby.com/): светлое окружение, крупная демонстрация macOS, округлый жирный заголовок, объёмная оранжевая иконка, чёрные кнопки-капсулы и рукописные подсказки.
-- [Bendy](https://trybendy.app/): светлое окружение, свободная композиция с большим количеством воздуха, крупная демонстрация продукта, сдержанная типографика и чёрная кнопка-капсула.
+- [Keeby](https://getkeeby.com/): light surroundings, a large macOS demonstration, a rounded bold headline, a dimensional orange icon, black pill buttons, and handwritten hints.
+- [Bendy](https://trybendy.app/): light surroundings, generous whitespace, a large product demonstration, restrained typography, and a black pill button.
 
-Предлагаемое направление для обсуждения: светлая страница с коротким вступлением и работающим редактором сразу на главной. Большое превью слева и компактная панель свойств справа. При пяти фиксированных элементах отдельную левую панель можно заменить компактным переключателем элементов в панели свойств. Прямой выбор объектов на холсте сохраняется; скрытые текст и стрелка доступны в панели.
+Agreed direction: a light page with a short introduction and a working editor directly on the homepage. A large preview sits on the left, with a compact properties panel on the right. With five fixed elements, a compact element selector can replace a separate left sidebar. Direct canvas selection remains available; hidden text and arrows remain accessible in the panel.
 
-Визуальный характер: почти белый фон, графитовый текст, мягкие тени окна DMG, чёрная основная кнопка Export, цвет сосредоточен в пользовательской композиции и собственной иконке продукта. Рукописная подсказка может однократно объяснить перетаскивание и исчезнуть после первого взаимодействия. Пользователь согласовал направление редактора на главной после обсуждения референсов; детали контролов ещё прорабатываются.
+Use an almost-white page, graphite text, soft shadows around the DMG window, and a black Export button. Concentrate color in the user's composition and the product's own icon. A handwritten hint can introduce dragging and disappear after the first interaction. Detailed control design remains open.
 
-## DialKit — оценка для панели свойств
+## DialKit assessment
 
-Пользователь предложил [DialKit](https://www.dialkit.dev/). Изучены сайт, демонстрация Photo Stack и официальная документация.
+The user proposed [DialKit](https://www.dialkit.dev/). Its website, Photo Stack demo, and official documentation were reviewed.
 
-Подходящие возможности: числовые слайдеры с ручным вводом, текст, выбор вариантов, цвета, изображения, переключатели, группы. Поддерживаются светлая тема и размещение панели внутри контейнера через inline-режим. React-интеграция рассчитана на клиентский компонент; готовый DialRoot требует productionEnabled для отображения в production.
+Relevant features include numeric sliders with manual entry, text, selects, colors, images, toggles, and groups. Light theme and inline panel placement are supported. React integration uses a client component; the ready-made DialRoot requires productionEnabled to appear in production.
 
-Рекомендация: использовать экспортируемые отдельные контролы DialKit в собственной панели свойств. Это позволяет сохранить выбранную компоновку, показывать поля по типу фона и выбранному объекту, а изменения направлять в единую модель документа с общей историей действий. Альтернатива для быстрого прототипа — готовая inline-панель с контроллером setValue/setValues для обновлений от холста.
+Recommendation: use individually exported DialKit controls inside a custom properties panel. This preserves the chosen layout, allows fields to depend on background type and selected object, and routes edits through the shared document model and undo history. A ready-made inline panel with setValue/setValues updates from canvas interactions is an alternative for a quick prototype.
 
-Собственная реализация остаётся нужна для холста Finder, выделения и перетаскивания, направляющих, редактора точек градиента, истории операций и экспорта фона/конфигов/ZIP. Встроенная Copy в DialKit копирует параметры и инструкцию по изменению конфигурации, поэтому не заменяет экспорт для сборщиков.
+Custom implementation is still required for the Finder canvas, selection and dragging, alignment guides, gradient-stop editing, operation history, and background/configuration/ZIP export. DialKit's built-in Copy produces parameters and a configuration-update instruction; it does not replace packaging-tool export.
 
-ImageControl принимает локальные изображения до 10 МБ и возвращает data URL. Хранение изображений и восстановление проекта нужно спроектировать отдельно с учётом ограничений browser storage. Наличие загрузки изображений не подтверждает поддержку ICNS.
+ImageControl accepts local images up to 10 MB and returns a data URL. Asset persistence and project restoration require separate design that accounts for browser storage limits. Image upload support does not establish ICNS support.
 
-Источники: [README](https://github.com/joshpuckett/dialkit), [API и отдельные контролы](https://github.com/joshpuckett/dialkit/blob/main/docs/reference.md#custom-layouts). Оценка выполнена по документации и демонстрации; интеграция в проект пока не проверялась.
+Sources: [README](https://github.com/joshpuckett/dialkit), [API and individual controls](https://github.com/joshpuckett/dialkit/blob/main/docs/reference.md#custom-layouts). This assessment is based on documentation and the demo; integration in this project has not yet been tested.
 
-## Источники
+## Packaging references
 
 - [electron-builder DMG](https://www.electron.build/dmg/)
 - [Tauri DmgConfig](https://v2.tauri.app/reference/config/#dmgconfig)
