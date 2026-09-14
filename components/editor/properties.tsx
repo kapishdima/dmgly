@@ -359,6 +359,7 @@ export function Inspector({
   return (
     <aside
       className="inspector"
+      aria-label="Design settings"
       onPointerDownCapture={onBegin}
       onPointerUpCapture={(e) => {
         if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement))
@@ -368,10 +369,6 @@ export function Inspector({
       onFocusCapture={onBegin}
       onBlurCapture={onEnd}
     >
-      <div className="inspector-heading">
-        <h2>Design</h2>
-        <p>Every detail, in its place.</p>
-      </div>
       <div className="element-tabs" aria-label="Select element">
         {(Object.keys(labels) as ElementId[]).map((id) => (
           <button

@@ -142,13 +142,11 @@
   padding: 0 0 12px;
   border-bottom: 1px solid var(--line);
 }
-.preview-toolbar h2,
-.inspector-heading h2 {
+.preview-toolbar h2 {
   font-size: 16px;
   font-weight: 600;
 }
-.preview-toolbar p,
-.inspector-heading p {
+.preview-toolbar p {
   font-size: 13px;
   color: var(--muted);
   margin-top: 3px;
@@ -442,21 +440,18 @@
   height: 660px;
   min-width: 0;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
   background: var(--surface);
   border-radius: var(--editor-radius);
   box-shadow:
     0 0 0 1px rgb(0 0 0 / 4%),
     -4px 4px 16px rgb(0 0 0 / 4%);
 }
-.inspector-heading {
-  padding: 20px 20px 16px;
-}
 .element-tabs {
   display: grid;
   grid-template-columns: minmax(96px, 1.6fr) repeat(4, minmax(0, 1fr));
   gap: 4px;
-  padding: 0 12px 16px;
+  padding: 12px;
   border-bottom: 1px solid var(--line);
 }
 .element-tabs button {
@@ -464,8 +459,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 56px;
+  gap: 4px;
+  min-height: 48px;
   min-width: 0;
   padding: 6px 0;
   border: 0;
