@@ -273,6 +273,14 @@ export function DecorationProperties({
             options={["left", "center", "right"]}
             onChange={(align) => onChange({ ...d, text: { ...t, align: align as typeof t.align } })}
           />
+          <Slider
+            label="Rotation"
+            value={t.rotation}
+            min={-180}
+            max={180}
+            step={1}
+            onChange={(rotation) => onChange({ ...d, text: { ...t, rotation } })}
+          />
         </>
       ) : (
         <>
@@ -304,6 +312,14 @@ export function DecorationProperties({
             max={14}
             step={1}
             onChange={(thickness) => onChange({ ...d, arrow: { ...a, thickness } })}
+          />
+          <Slider
+            label="Scale"
+            value={a.scale}
+            min={0.25}
+            max={4}
+            step={0.01}
+            onChange={(scale) => onChange({ ...d, arrow: { ...a, scale } })}
           />
           <Slider
             label="Rotation"
@@ -422,7 +438,7 @@ export function Inspector({
               step={1}
               onChange={(y) => onChange(moveElement(d, selected, d[selected].x, y))}
             />
-            {native && <p className="control-note">Native icon size is 128 px.</p>}
+            {native && <p className="control-note">Finder icons stay upright at 128 px.</p>}
           </div>
         )}
       </div>

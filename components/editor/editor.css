@@ -334,7 +334,7 @@
 }
 .artboard {
   position: relative;
-  overflow: hidden;
+  overflow: clip;
   border-radius: 0 0 18px 18px;
 }
 .artwork {
@@ -361,8 +361,68 @@
   cursor: grabbing !important;
 }
 .canvas-object.selected {
-  outline: 1.5px solid #696963;
-  outline-offset: 6px;
+  outline: none;
+}
+.canvas-object.member-selected {
+  outline: 1px dashed #8a8a84;
+  outline-offset: 3px;
+}
+.selection-frame {
+  position: absolute;
+  border: solid #787872;
+  pointer-events: none;
+  z-index: 12;
+}
+.selection-frame:not(.transformable) {
+  border-style: dashed;
+}
+.dmgly .transform-handle {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+  touch-action: none;
+  border-radius: 6px;
+}
+.dmgly .transform-handle:active {
+  scale: none;
+}
+.scale-handle span {
+  width: 8px;
+  height: 8px;
+  border: 1px solid #595954;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+}
+.rotate-handle .ui-icon {
+  color: #33332f;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px #fff;
+}
+.rotate-handle {
+  opacity: 0;
+}
+.selection-frame:hover .rotate-handle,
+.selection-frame:focus-within .rotate-handle,
+.rotate-handle:hover,
+.rotate-handle:active {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .dmgly .transform-handle {
+    width: 32px;
+    height: 32px;
+  }
+  .rotate-handle {
+    opacity: 1;
+  }
 }
 .native-object {
   width: 128px;

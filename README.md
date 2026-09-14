@@ -1,7 +1,5 @@
 <p align="center">
-  <img src="public/assets/generic-application.png" width="72" alt="App" />
-  &nbsp;&nbsp;⟶&nbsp;&nbsp;
-  <img src="public/assets/applications-folder.png" width="72" alt="Applications folder" />
+  <img src="docs/images/default-preview.png" width="690" alt="Dmgly default installer preview in a macOS window, with the app icon, installation arrow, and Applications folder" />
 </p>
 
 <h1 align="center">Dmgly</h1>

@@ -23,18 +23,19 @@ export function rotatePoint(point: Point, center: Point, degrees: number): Point
   return { x: center.x + x * cos - y * sin, y: center.y + x * sin + y * cos };
 }
 
-export function elementFrame(d: Composition, id: MovableId): SelectionFrame {
+export function elementFrame(d: Composition, id: MovableId, textFrame?: SelectionFrame | null): SelectionFrame {
+  if (id === "text" && textFrame) return textFrame;
   const bounds = id === "text" ? textBounds(d)
     : id === "arrow" ? { width: (d.arrow.width + 20) * d.arrow.scale, height: 60 * d.arrow.scale }
     : { width: ICON_SIZE, height: ICON_SIZE };
   return { ...bounds, x: d[id].x, y: d[id].y, rotation: id === "text" || id === "arrow" ? d[id].rotation : 0 };
 }
 
-export function selectionFrame(d: Composition, ids: MovableId[]): SelectionFrame | null {
+export function selectionFrame(d: Composition, ids: MovableId[], textFrame?: SelectionFrame | null): SelectionFrame | null {
   if (!ids.length) return null;
-  if (ids.length === 1) return elementFrame(d, ids[0]);
+  if (ids.length === 1) return elementFrame(d, ids[0], textFrame);
   const points = ids.flatMap((id) => {
-    const frame = elementFrame(d, id);
+    const frame = elementFrame(d, id, textFrame);
     return [-1, 1].flatMap((x) => [-1, 1].map((y) => rotatePoint({
       x: frame.x + x * frame.width / 2, y: frame.y + y * frame.height / 2,
     }, frame, frame.rotation)));
@@ -86,7 +87,16 @@ export function scaleSelection(d: Composition, ids: MovableId[], anchor: Point, 
   for (const id of ids) {
     if (id === "text") { min = Math.max(min, 12 / d.text.size); max = Math.min(max, 64 / d.text.size); }
     if (id === "arrow") { min = Math.max(min, 0.25 / d.arrow.scale); max = Math.min(max, 4 / d.arrow.scale); }
+    for (const axis of ["x", "y"] as const) {
+      const offset = d[id][axis] - anchor[axis];
+      if (offset === 0) continue;
+      const limit = axis === "x" ? d.window.width : d.window.height - TITLEBAR_HEIGHT;
+      const a = -anchor[axis] / offset, b = (limit - anchor[axis]) / offset;
+      min = Math.max(min, Math.min(a, b));
+      max = Math.min(max, Math.max(a, b));
+    }
   }
+  if (min > max) return d;
   const ratio = clamp(factor, min, max);
   if (ratio === 1) return d;
   const next = { ...d };

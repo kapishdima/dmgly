@@ -1,7 +1,7 @@
 /* Local data URLs must render immediately and never go through a remote image optimizer. */
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   CircleIcon,
@@ -58,8 +58,9 @@ export function DmgCanvas({
   const drag = useRef<Gesture | null>(null);
   const keyboardMove = useRef(false);
   const [transformFrame, setTransformFrame] = useState<SelectionFrame | null>(null);
+  const [textFrame, setTextFrame] = useState<SelectionFrame | null>(null);
   const ids = visibleElements(d).filter((id) => selected.includes(id));
-  const frame = transformFrame ?? selectionFrame(d, ids);
+  const frame = transformFrame ?? selectionFrame(d, ids, textFrame);
   const [available, setAvailable] = useState(660);
   const [zoom, setZoom] = useState<number | "fit">("fit");
   const [guides, setGuides] = useState<{ x?: number; y?: number }>({});
@@ -71,6 +72,13 @@ export function DmgCanvas({
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+  useLayoutEffect(() => {
+    const text = artboard.current?.querySelector<SVGTextElement>(".artwork text");
+    if (!text) return;
+    const box = text.getBBox();
+    const center = rotatePoint({ x: box.x + box.width / 2, y: box.y + box.height / 2 }, d.text, d.text.rotation);
+    setTextFrame({ ...center, width: Math.max(16, box.width), height: Math.max(24, box.height), rotation: d.text.rotation });
+  }, [d.text]);
   const canvasPadding = available < 500 ? 24 : 48;
   const scale =
     zoom === "fit"
@@ -129,6 +137,7 @@ export function DmgCanvas({
         - Math.atan2(start.pointer.y - start.center.y, start.pointer.x - start.center.x)) * 180 / Math.PI;
       const degrees = e.shiftKey ? Math.round((start.frame.rotation + angle) / 15) * 15 - start.frame.rotation : angle;
       const next = rotateSelection(start.document, start.ids, start.center, degrees);
+      if (next === start.document && degrees !== 0) return;
       onChange(next);
       setTransformFrame({ ...start.frame, rotation: start.frame.rotation + (next === start.document ? 0 : degrees) });
     } else {
@@ -148,6 +157,7 @@ export function DmgCanvas({
     drag.current = { kind, document: d, ids, pointer: pointer(e), center: frame, anchor, frame };
   }
   function keyboard(e: React.KeyboardEvent) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") finish();
     if (e.key === "Escape") {
       e.preventDefault();
       if (drag.current) finish(true);
@@ -173,18 +183,17 @@ export function DmgCanvas({
     label: string,
     native = false,
   ) {
-    const el = d[id];
-    const bounds = elementFrame(d, id);
+    const bounds = elementFrame(d, id, textFrame);
     return (
       <button
         type="button"
         key={id}
-        className={`canvas-object ${native ? "native-object" : "decoration-object"} ${selected.includes(id) ? "selected" : ""}`}
+        className={`canvas-object ${native ? "native-object" : "decoration-object"} ${selected.includes(id) ? `selected${ids.length > 1 ? " member-selected" : ""}` : ""}`}
         aria-label={label}
         aria-pressed={selected.includes(id)}
         style={{
-          left: el.x,
-          top: el.y,
+          left: bounds.x,
+          top: bounds.y,
           transform: `translate(-50%,-50%) rotate(${bounds.rotation}deg)`,
         }}
         onClick={(e) => {
@@ -201,7 +210,7 @@ export function DmgCanvas({
           const moving = visibleElements(d).filter((item) => selection.includes(item));
           if (!moving.includes(id)) return;
           onBegin?.();
-          const bounds = selectionFrame(d, moving)!;
+          const bounds = selectionFrame(d, moving, textFrame)!;
           drag.current = { kind: "move", ids: moving, document: d, pointer: pointer(e), center: bounds, anchor: bounds, frame: bounds };
           e.currentTarget.setPointerCapture(e.pointerId);
         }}
@@ -216,7 +225,7 @@ export function DmgCanvas({
   }
   return (
     <>
-      <div ref={host} className="canvas-host" tabIndex={0} role="group" aria-label="Preview canvas"
+      <div ref={host} className="canvas-host" tabIndex={0} role="group" aria-label="Preview canvas" aria-keyshortcuts="Meta+A Control+A"
         onKeyDown={keyboard} onKeyUp={finishKeyboard} onBlur={finishKeyboard}>
         <div className="canvas-scroll" style={{ padding: canvasPadding }}>
           <div
@@ -311,8 +320,8 @@ export function DmgCanvas({
                     <span
                       style={{
                         display: "block",
-                        width: textBounds(d).width,
-                        height: textBounds(d).height,
+                        width: textFrame?.width ?? textBounds(d).width,
+                        height: textFrame?.height ?? textBounds(d).height,
                       }}
                     />,
                     "Instruction text",
@@ -354,7 +363,7 @@ export function DmgCanvas({
         </span>
         <p className="preview-note">
           <Icon icon={Cursor01Icon} size={16} />
-          <span>{ids.length > 1 ? `${ids.length} selected. Drag to move together.` : canTransform(ids)
+          <span aria-live="polite">{ids.length > 1 ? `${ids.length} selected. Drag to move together.` : canTransform(ids)
             ? "Drag corners to scale. Drag outside corners to rotate."
             : "Shift-click to select more. ⌘A to select all."}</span>
         </p>
