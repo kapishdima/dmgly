@@ -13,7 +13,13 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { textBounds } from "@/lib/dmgly/artwork";
-import { Composition, ElementId, MovableId, moveElement, TITLEBAR_HEIGHT } from "@/lib/dmgly/model";
+import {
+  Composition,
+  ElementId,
+  MovableId,
+  moveElement,
+  TITLEBAR_HEIGHT,
+} from "@/lib/dmgly/model";
 
 export function DmgCanvas({
   document: d,
@@ -45,11 +51,17 @@ export function DmgCanvas({
   const [guides, setGuides] = useState<{ x?: number; y?: number }>({});
   useEffect(() => {
     const el = host.current!;
-    const observer = new ResizeObserver((entries) => setAvailable(entries[0].contentRect.width));
+    const observer = new ResizeObserver((entries) =>
+      setAvailable(entries[0].contentRect.width),
+    );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-  const scale = zoom === "fit" ? Math.min(1, Math.max(1, available - 96) / d.window.width) : zoom;
+  const canvasPadding = available < 500 ? 24 : 48;
+  const scale =
+    zoom === "fit"
+      ? Math.min(1, Math.max(1, available - canvasPadding * 2) / d.window.width)
+      : zoom;
   function snap(id: MovableId, x: number, y: number) {
     const xs = [d.window.width / 2],
       ys = [(d.window.height - TITLEBAR_HEIGHT) / 2];
@@ -63,7 +75,12 @@ export function DmgCanvas({
     setGuides({ x: gx, y: gy });
     return [gx ?? x, gy ?? y];
   }
-  function item(id: MovableId, content: React.ReactNode, label: string, native = false) {
+  function item(
+    id: MovableId,
+    content: React.ReactNode,
+    label: string,
+    native = false,
+  ) {
     const el = d[id];
     const textOffset =
       id === "text"
@@ -93,7 +110,13 @@ export function DmgCanvas({
           e.currentTarget.focus();
           onSelect(id);
           onBegin?.();
-          drag.current = { id, clientX: e.clientX, clientY: e.clientY, x: el.x, y: el.y };
+          drag.current = {
+            id,
+            clientX: e.clientX,
+            clientY: e.clientY,
+            x: el.x,
+            y: el.y,
+          };
           e.currentTarget.setPointerCapture(e.pointerId);
         }}
         onPointerMove={(e) => {
@@ -139,10 +162,13 @@ export function DmgCanvas({
   return (
     <>
       <div ref={host} className="canvas-host">
-        <div className="canvas-scroll">
+        <div className="canvas-scroll" style={{ padding: canvasPadding }}>
           <div
             className="canvas-size"
-            style={{ width: d.window.width * scale, height: d.window.height * scale }}
+            style={{
+              width: d.window.width * scale,
+              height: d.window.height * scale,
+            }}
           >
             <div
               className="finder live-finder"
@@ -154,9 +180,24 @@ export function DmgCanvas({
             >
               <div className="finder-title">
                 <span className="traffic-lights" aria-hidden="true">
-                  <HugeiconsIcon icon={CircleIcon} size={12} fill="currentColor" strokeWidth={0} />
-                  <HugeiconsIcon icon={CircleIcon} size={12} fill="currentColor" strokeWidth={0} />
-                  <HugeiconsIcon icon={CircleIcon} size={12} fill="currentColor" strokeWidth={0} />
+                  <HugeiconsIcon
+                    icon={CircleIcon}
+                    size={12}
+                    fill="currentColor"
+                    strokeWidth={0}
+                  />
+                  <HugeiconsIcon
+                    icon={CircleIcon}
+                    size={12}
+                    fill="currentColor"
+                    strokeWidth={0}
+                  />
+                  <HugeiconsIcon
+                    icon={CircleIcon}
+                    size={12}
+                    fill="currentColor"
+                    strokeWidth={0}
+                  />
                 </span>
                 <span className="finder-name">
                   <Icon icon={HardDriveIcon} size={15} />
@@ -171,7 +212,9 @@ export function DmgCanvas({
                 {artwork || (
                   <div
                     className="artwork"
-                    style={{ background: "linear-gradient(135deg,#ffefd5,#e9a26c)" }}
+                    style={{
+                      background: "linear-gradient(135deg,#ffefd5,#e9a26c)",
+                    }}
                   />
                 )}
                 {item(
@@ -226,7 +269,13 @@ export function DmgCanvas({
                 {d.arrow.visible &&
                   item(
                     "arrow",
-                    <span style={{ display: "block", width: d.arrow.width + 20, height: 60 }} />,
+                    <span
+                      style={{
+                        display: "block",
+                        width: d.arrow.width + 20,
+                        height: 60,
+                      }}
+                    />,
                     "Installation arrow",
                   )}
                 {guides.x !== undefined && (
@@ -263,7 +312,11 @@ export function DmgCanvas({
           >
             <Icon icon={Add01Icon} />
           </button>
-          <button type="button" className="toolbar-button" onClick={() => setZoom("fit")}>
+          <button
+            type="button"
+            className="toolbar-button"
+            onClick={() => setZoom("fit")}
+          >
             <Icon icon={Maximize01Icon} />
             Fit
           </button>

@@ -749,127 +749,234 @@
 .export-backdrop {
   position: fixed;
   inset: 0;
-  background: #2727234d;
-  backdrop-filter: blur(5px);
-  z-index: 50;
+  background: rgb(32 32 29 / 22%);
+  backdrop-filter: blur(6px);
+  z-index: var(--z-modal, 200);
 }
 .export-dialog.dmgly {
   position: fixed;
-  z-index: 51;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(630px, calc(100vw - 32px));
-  max-height: calc(100dvh - 40px);
+  z-index: var(--z-modal);
+  width: min(720px, calc(100vw - 40px));
+  height: min(740px, calc(100dvh - 48px));
   min-height: 0;
-  overflow: auto;
-  background: #fafaf7;
-  border-radius: 22px;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(100px, 1fr) auto auto auto;
+  gap: 20px;
+  background: #fff;
+  border-radius: 20px;
   padding: 28px;
-  box-shadow: 0 35px 100px #0003;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 6%),
+    0 24px 80px -16px rgb(0 0 0 / 25%);
 }
 .export-heading {
   display: flex;
-  justify-content: space-between;
   align-items: start;
+  justify-content: space-between;
   gap: 20px;
 }
 .export-heading h2 {
-  font-size: 23px;
-  font-weight: 600;
-  letter-spacing: -0.8px;
-  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
 }
 .export-heading p {
-  font-size: 14px;
-  color: #6b6b62;
-  margin: 8px 0 25px;
+  color: var(--muted);
+  margin-top: 4px;
 }
 .close-button {
-  border: 0;
-  background: #eeeeea;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  color: #777;
+  background: #f5f5f2;
 }
 .export-target {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
-  color: #777;
-  margin-bottom: 16px;
+  gap: 24px;
 }
-.export-target select {
+.export-target > p {
   font-size: 13px;
-  padding: 9px 12px;
-  background: #efefea;
+  font-weight: 500;
+  color: #64645d;
+}
+.platform-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-width: 224px;
+  min-height: 44px;
+  padding: 8px 12px;
   border: 0;
+  border-radius: 9px;
+  background: #f5f5f2;
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+}
+.platform-trigger:hover,
+.platform-trigger[data-popup-open] {
+  background: #eeeeea;
+}
+.platform-positioner {
+  z-index: 300;
+}
+.platform-popup.dmgly {
+  min-height: 0;
+  width: var(--anchor-width);
+  background: #fff;
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 7%),
+    0 10px 32px -8px rgb(0 0 0 / 20%);
+}
+.platform-option {
+  min-height: 64px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
   border-radius: 8px;
-  max-width: 75%;
+  cursor: pointer;
+  outline: none;
+  font-size: 14px;
+}
+.platform-option p {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.platform-option[data-highlighted] {
+  background: #f2f2ee;
 }
 .export-tabs {
-  margin-bottom: 14px;
-}
-.export-code {
   width: 100%;
-  height: 240px;
-  border: 1px solid #e3e3dc;
-  border-radius: 10px;
-  background: #f1f1ed;
-  padding: 14px;
-  font:
-    12px/1.7 var(--font-geist-mono),
-    monospace !important;
-  resize: vertical;
-  color: #56564c;
 }
-.export-helper,
-.export-warning {
+.export-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.code-frame {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: #fbfbf9;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+.code-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
   font-size: 12px;
-  color: #6b6b62;
-  line-height: 1.6;
-  margin: 12px 0;
+  color: var(--muted);
+}
+.code-heading span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.code-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.code-scroll pre {
+  margin: 0;
+  padding: 16px;
+  min-width: max-content;
+  background: transparent !important;
+  font:
+    12px/1.8 var(--font-geist-mono),
+    monospace;
+  tab-size: 2;
+}
+.code-scroll code {
+  font: inherit;
+}
+.code-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.code-scroll::-webkit-scrollbar-thumb {
+  background: rgb(0 0 0 / 20%);
+  border-radius: 4px;
+}
+.code-scroll[data-language="markdown"] pre {
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.export-error {
+  padding: 20px;
+  color: #a53c2b;
+}
+.export-notes {
+  height: 68px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
 }
 .export-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-top: 20px;
 }
 .export-actions .secondary-button {
-  margin: 0;
-  min-width: 140px;
-  border-radius: 30px;
-}
-.export-actions .primary-button {
-  justify-content: center;
-  gap: 18px;
+  min-height: 46px;
 }
 .export-message {
+  color: var(--muted);
   font-size: 12px;
-  line-height: 1.5;
-  color: #6b6b62;
-  min-height: 18px;
-  margin: 16px 0 0;
+  height: 36px;
+  overflow: auto;
 }
 @media (max-width: 520px) {
   .export-dialog.dmgly {
-    padding: 22px 18px;
+    padding: 20px;
+    gap: 16px;
+    width: calc(100vw - 24px);
+    height: calc(100dvh - 24px);
   }
   .export-heading h2 {
-    font-size: 20px;
+    font-size: 22px;
   }
-  .export-actions {
-    flex-direction: column;
+  .export-heading p {
+    font-size: 14px;
   }
-  .export-actions .secondary-button {
+  .platform-trigger {
+    min-width: 0;
+    width: 66%;
+  }
+  .code-heading {
+    padding-inline: 12px;
+  }
+  .code-scroll pre {
     padding: 12px;
   }
-  .export-target {
-    gap: 12px;
+  .export-actions {
+    gap: 8px;
   }
-  .export-code {
-    height: 200px;
+  .export-actions button {
+    font-size: 13px;
+    padding-inline: 8px;
+  }
+  .export-notes {
+    height: 76px;
   }
 }
