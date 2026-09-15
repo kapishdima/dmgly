@@ -20,7 +20,7 @@ export function assetPaths(d: Composition) {
   ];
 }
 export const commonInstructions =
-  "The background already includes visible text and arrows. App and Applications icons remain real Finder items. The preview approximates Finder; check the final DMG on macOS. The PNG is exported at 1x; Retina backgrounds are not included.\n\nApply the target-specific instructions above. Preserve signing, notarization, update, and unrelated build settings. Copying configuration or an AI prompt does not transfer the image files.";
+  "The background already includes visible text, arrows, and label backgrounds. App and Applications icons and filename labels remain real Finder items. The preview approximates Finder; check that the actual filenames fit on their backgrounds in the final DMG on macOS. The PNG is exported at 1x; Retina backgrounds are not included.\n\nApply the target-specific instructions above. Preserve signing, notarization, update, and unrelated build settings. Copying configuration or an AI prompt does not transfer the image files.";
 export function iconInstructions(d: Composition) {
   return d.app.image
     ? "The optional assets/app-icon.png is a normalized 512px reference. Integrate it through your existing app-icon pipeline (generate ICNS or the required icon set); changing a DMG background does not change the built .app icon."

@@ -18,9 +18,11 @@ import {
   Composition,
   ElementId,
   moveElement,
+  movementLimits,
+  moveLabelBackground,
   resizeWindow,
-  TITLEBAR_HEIGHT,
 } from "@/lib/dmgly/model";
+import { measureLabelWidths } from "@/lib/dmgly/label-metrics";
 
 export function hexColor(value: string): string {
   const c = document.createElement("canvas").getContext("2d")!;
@@ -35,6 +37,45 @@ export function hexColor(value: string): string {
       .join("")
   );
 }
+function LabelBackgroundProperties({ document: d, id, onChange }: {
+  document: Composition;
+  id: "app" | "applications";
+  onChange: (d: Composition) => void;
+}) {
+  const plate = d[id].labelBackground;
+  const update = (patch: Partial<typeof plate>) => {
+    const next = { ...d, [id]: { ...d[id], labelBackground: { ...plate, ...patch } } };
+    onChange(moveLabelBackground(next, id, next[id].labelBackground.offsetX, next[id].labelBackground.offsetY, measureLabelWidths(d.app.name)[id]));
+  };
+  return (
+    <div
+      className="dialkit-root control-stack position-controls label-background-controls"
+      data-theme="light"
+      role="group"
+      aria-labelledby={`${id}-label-background-heading`}
+    >
+      <p className="field-label" id={`${id}-label-background-heading`}>Label background</p>
+      <Toggle label="Visible" checked={plate.visible} onChange={(visible) => update({ visible })} />
+      {plate.visible && <>
+        <ColorControl label="Background color" value={plate.color} onChange={(value) => update({ color: hexColor(value) })} />
+        <Slider label="Opacity" value={plate.opacity} min={0} max={100} step={1} onChange={(opacity) => update({ opacity })} />
+        <Toggle label="Fit to text" checked={plate.autoSize} onChange={(autoSize) => update({ autoSize,
+          ...(autoSize ? {} : { width: Math.min(164, measureLabelWidths(d.app.name)[id]) + 8, height: 24 }),
+        })} />
+        {!plate.autoSize && <>
+          <Slider label="Background width" value={plate.width} min={16} max={320} step={1} onChange={(width) => update({ width })} />
+          <Slider label="Background height" value={plate.height} min={24} max={96} step={1} onChange={(height) => update({ height })} />
+        </>}
+        <Slider label="Corner radius" value={plate.radius} min={0} max={48} step={1} onChange={(radius) => update({ radius })} />
+        <Slider label="Background offset X" value={plate.offsetX} min={-d.window.width} max={d.window.width} step={1} onChange={(offsetX) => update({ offsetX })} />
+        <Slider label="Background offset Y" value={plate.offsetY} min={-d.window.height} max={d.window.height} step={1} onChange={(offsetY) => update({ offsetY })} />
+        <button type="button" className="toolbar-button" onClick={() => update({ offsetX: 0, offsetY: 0 })}>Center under name</button>
+        <p className="control-note">Drag the background to reposition it. Fit to text adds 4 px on each side. Check the final label fit in Finder.</p>
+      </>}
+    </div>
+  );
+}
+
 export function BackgroundProperties({
   document: d,
   onChange,
@@ -361,6 +402,7 @@ export function Inspector({
     arrow: "Arrow",
   };
   const native = selected === "app" || selected === "applications";
+  const limits = selected === "background" ? null : movementLimits(d, selected);
   const scroll = useRef<HTMLDivElement>(null);
   useEffect(() => {
     scroll.current?.scrollTo({ top: 0 });
@@ -419,22 +461,23 @@ export function Inspector({
         {(selected === "text" || selected === "arrow") && (
           <DecorationProperties document={d} id={selected} onChange={onChange} />
         )}
-        {selected !== "background" && (
+        {native && <LabelBackgroundProperties document={d} id={selected} onChange={onChange} />}
+        {selected !== "background" && limits && (
           <div className="dialkit-root control-stack position-controls" data-theme="light">
             <p className="field-label">Position</p>
             <Slider
               label="X"
               value={d[selected].x}
-              min={native ? 72 : 16}
-              max={d.window.width - (native ? 72 : 16)}
+              min={limits.minX}
+              max={limits.maxX}
               step={1}
               onChange={(x) => onChange(moveElement(d, selected, x, d[selected].y))}
             />
             <Slider
               label="Y"
               value={d[selected].y}
-              min={native ? 72 : 16}
-              max={d.window.height - TITLEBAR_HEIGHT - (native ? 96 : 16)}
+              min={limits.minY}
+              max={limits.maxY}
               step={1}
               onChange={(y) => onChange(moveElement(d, selected, d[selected].x, y))}
             />

@@ -4,11 +4,12 @@ The approved approach is a light background behind each native Finder label. Fin
 
 ## Design
 
-- Store independent `labelBackground` settings on App and Applications: visible, color, opacity, width, height, and radius.
-- Default to a white plate at 96% opacity, 180 × 48 logical pixels, with 8 px corners. Anchor it below the 128 px icon, leaving space for Finder's larger or wrapped labels.
+- Store independent `labelBackground` settings on App and Applications: visible, color, opacity, auto size, width, height, radius, and relative X/Y offsets.
+- Default to a white plate at 96% opacity, measured label width plus 4 px padding on every side, with 4 px corners. The label line box is 16 px high; the default badge is 24 px high. Manual width/height remains available by disabling Fit to text.
 - Expose the controls in each native item's inspector using the existing controls. Retain values when disabled.
 - Draw plates after the background and decorative artwork, before native Finder items. Remove the automatic CSS label background.
-- Keep plates inside the visible canvas during movement and resizing. Use the same limits for pointer, keyboard, and inspector changes.
+- Drag each plate independently using a transparent hit target over the rendered rectangle. Keyboard arrows move it by 1 px (Shift: 10 px). Each gesture is one undo transaction, and Escape cancels it. Clamp independent plate movement and resizing to the visible canvas. Relative offsets follow the icon on later icon moves.
+- Use the same browser text measurement for preview and PNG export. SSR uses an approximate width until the label is measured. Keep native filenames outside the PNG.
 - Existing compositions without the new fields receive the defaults. URL state and undo use the existing composition pipeline. Packaging adapters must continue to emit coordinates only.
 - Explain that plates are part of the exported image and that final label fit depends on Finder and the actual app name.
 

@@ -7,7 +7,7 @@ export async function upgradeStarterDraft(draft: Composition): Promise<Compositi
     ...current,
     window: { width: 660, height: 400 },
     app: { ...current.app, x: 180, y: 170 },
-    applications: { x: 480, y: 170 },
+    applications: { ...current.applications, x: 480, y: 170 },
     text: { ...current.text, x: 330, y: 302 },
     arrow: { ...current.arrow, shape: "straight", width: 86, rotation: 0, x: 330, y: 170 },
   };

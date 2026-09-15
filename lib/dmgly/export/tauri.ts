@@ -9,7 +9,7 @@ export function tauriConfig(document: Composition): ExportConfig {
             background: "dmgly/assets/dmg-background.png",
             windowSize: d.window,
             appPosition: { x: d.app.x, y: d.app.y },
-            applicationFolderPosition: d.applications,
+            applicationFolderPosition: { x: d.applications.x, y: d.applications.y },
           },
         },
       },

@@ -83,7 +83,7 @@ export function ShortcutsDialog() {
           </div>
           <div className="shortcuts-body">
             {groups.map((group) => (
-              <section key={group.title} aria-label={group.title}>
+              <section key={group.title} className={`shortcuts-${group.title.toLowerCase()}`} aria-label={group.title}>
                 <h3>{group.title}</h3>
                 {"description" in group && <p className="shortcuts-hint">{group.description}</p>}
                 <dl>

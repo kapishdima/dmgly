@@ -8,7 +8,7 @@ function previousImageStarter(): Composition {
   d.window = { width: 660, height: 400 };
   d.app.x = 180;
   d.app.y = 170;
-  d.applications = { x: 480, y: 170 };
+  d.applications = { ...d.applications, x: 480, y: 170 };
   d.text.x = 330;
   d.text.y = 302;
   Object.assign(d.arrow, { shape: "straight", width: 86, rotation: 0, x: 330, y: 170 });

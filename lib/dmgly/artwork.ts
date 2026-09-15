@@ -1,4 +1,5 @@
-import { Composition } from "./model";
+import { Composition, labelBackgroundBounds } from "./model";
+import type { LabelWidths } from "./label-metrics";
 export function escapeXml(s: string) {
   return s.replace(
     /[&<>"']/g,
@@ -82,6 +83,15 @@ export function decorationsMarkup(d: Composition): string {
   }
   return result;
 }
-export function artworkSvg(d: Composition) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${d.window.width}" height="${d.window.height}" viewBox="0 0 ${d.window.width} ${d.window.height}">${backgroundMarkup(d)}${decorationsMarkup(d)}</svg>`;
+export function artworkSvg(d: Composition, labelWidths?: LabelWidths) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${d.window.width}" height="${d.window.height}" viewBox="0 0 ${d.window.width} ${d.window.height}">${backgroundMarkup(d)}${decorationsMarkup(d)}${labelBackgroundsMarkup(d, labelWidths)}</svg>`;
+}
+
+export function labelBackgroundsMarkup(d: Composition, labelWidths?: LabelWidths): string {
+  return (["app", "applications"] as const).map((id) => {
+    const item = d[id], plate = item.labelBackground;
+    if (!plate.visible) return "";
+    const { x, y, width, height } = labelBackgroundBounds(d, id, labelWidths?.[id]);
+    return `<rect data-label-background="${id}" x="${x}" y="${y}" width="${width}" height="${height}" rx="${Math.min(plate.radius, width / 2, height / 2)}" fill="${plate.color}" fill-opacity="${plate.opacity / 100}"/>`;
+  }).join("");
 }

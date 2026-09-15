@@ -465,14 +465,17 @@
     BlinkMacSystemFont,
     sans-serif;
   color: #29231c;
-  padding: 2px 4px;
+  line-height: 16px;
+  padding: 0;
   border-radius: 4px;
 }
-.native-object.selected .icon-label {
-  background: rgb(255 255 255 / 65%);
+.label-badge {
+  z-index: 2;
 }
-.image-background .icon-label {
-  background: rgb(255 255 255 / 88%);
+.label-badge:hover,
+.label-badge:focus {
+  outline: 1px dashed #787872;
+  outline-offset: 2px;
 }
 .guide {
   position: absolute;
@@ -585,6 +588,7 @@
 .property-scroll {
   min-height: 0;
   overflow: auto;
+  scrollbar-width: thin;
   scrollbar-gutter: stable;
   padding: 20px 14px 20px 20px;
 }
@@ -669,6 +673,9 @@
 }
 .position-controls .field-label {
   padding-top: 0;
+}
+.label-background-controls {
+  border-top: 0;
 }
 .control-note {
   font-size: 12px;
@@ -1089,7 +1096,7 @@
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);
   z-index: var(--z-modal);
-  width: min(560px, calc(100vw - 24px));
+  width: min(900px, calc(100vw - 24px));
   min-height: 0;
   max-height: calc(100dvh - 32px);
   display: flex;
@@ -1122,14 +1129,21 @@
   margin-top: 4px;
 }
 .shortcuts-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "selection general"
+    "transform general";
+  gap: 24px 32px;
+  align-items: start;
   padding: 20px 24px;
   overflow-y: auto;
   overscroll-behavior: contain;
   min-height: 0;
 }
-.shortcuts-body section + section {
-  margin-top: 24px;
-}
+.shortcuts-selection { grid-area: selection; }
+.shortcuts-transform { grid-area: transform; }
+.shortcuts-general { grid-area: general; }
 .shortcuts-body h3 {
   font-size: 14px;
   font-weight: 600;
@@ -1177,6 +1191,12 @@
   flex-shrink: 0;
   border-top: 1px solid var(--line);
   padding: 16px 24px 20px;
+}
+@media (max-width: 760px) {
+  .shortcuts-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "selection" "transform" "general";
+  }
 }
 @media (max-width: 480px) {
   .shortcuts-heading { padding: 20px 16px 16px; }

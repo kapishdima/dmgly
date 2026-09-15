@@ -1,6 +1,7 @@
 import { Composition, snapshot } from "../model";
 import { artworkSvg } from "../artwork";
 import { loadImage } from "../images";
+import { measureLabelWidths } from "../label-metrics";
 export type RenderedAssets = Record<string, Uint8Array>;
 async function png(canvas: HTMLCanvasElement): Promise<Uint8Array> {
   return new Promise((resolve, reject) =>
@@ -19,7 +20,7 @@ export async function renderAssets(document: Composition): Promise<RenderedAsset
     throw new Error("Upload a background image, or choose Solid or Gradient.");
   await window.document.fonts.ready;
   const url = URL.createObjectURL(
-    new Blob([artworkSvg(d)], { type: "image/svg+xml;charset=utf-8" }),
+    new Blob([artworkSvg(d, measureLabelWidths(d.app.name))], { type: "image/svg+xml;charset=utf-8" }),
   );
   try {
     const image = await loadImage(url),

@@ -5,6 +5,7 @@ import {
   ElementId,
   ICON_SIZE,
   MovableId,
+  movementLimits,
   TITLEBAR_HEIGHT,
 } from "./model";
 
@@ -117,15 +118,11 @@ export function moveSelection(
     minY = -Infinity,
     maxY = Infinity;
   for (const id of ids) {
-    const native = id === "app" || id === "applications",
-      margin = native ? ICON_SIZE / 2 + 8 : 16;
-    minX = Math.max(minX, margin - d[id].x);
-    maxX = Math.min(maxX, d.window.width - margin - d[id].x);
-    minY = Math.max(minY, margin - d[id].y);
-    maxY = Math.min(
-      maxY,
-      d.window.height - TITLEBAR_HEIGHT - margin - (native ? 24 : 0) - d[id].y,
-    );
+    const limits = movementLimits(d, id);
+    minX = Math.max(minX, limits.minX - d[id].x);
+    maxX = Math.min(maxX, limits.maxX - d[id].x);
+    minY = Math.max(minY, limits.minY - d[id].y);
+    maxY = Math.min(maxY, limits.maxY - d[id].y);
   }
   const x = Math.round(clamp(dx, Math.min(0, minX), Math.max(0, maxX)));
   const y = Math.round(clamp(dy, Math.min(0, minY), Math.max(0, maxY)));

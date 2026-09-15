@@ -13,7 +13,6 @@ import { Icon } from "./icon";
 import { ExportDialog } from "./export-dialog";
 import { ShortcutsDialog } from "./shortcuts-dialog";
 import { Inspector } from "./properties";
-import { artworkSvg } from "@/lib/dmgly/artwork";
 import { DmgCanvas } from "./canvas";
 import { useDesignUrl } from "./use-design-url";
 import { useComposition } from "./use-composition";
@@ -140,12 +139,6 @@ export default function Editor() {
               onChange={setDocument}
               onBegin={begin}
               onEnd={end}
-              artwork={
-                <div
-                  className="artwork"
-                  dangerouslySetInnerHTML={{ __html: artworkSvg(document) }}
-                />
-              }
             />
           </section>
           <Inspector

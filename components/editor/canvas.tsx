@@ -12,7 +12,8 @@ import {
   Cursor01Icon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
-import { textBounds } from "@/lib/dmgly/artwork";
+import { artworkSvg, textBounds } from "@/lib/dmgly/artwork";
+import { measureLabelWidths, type LabelWidths } from "@/lib/dmgly/label-metrics";
 import {
   canTransform,
   elementFrame,
@@ -30,7 +31,7 @@ import { SelectionHandles } from "./selection-handles";
 import { CanvasRulers } from "./canvas-rulers";
 
 type Gesture = {
-  kind: "move" | "scale" | "rotate";
+  kind: "move" | "scale" | "rotate" | "badge";
   document: Composition;
   ids: MovableId[];
   pointer: Point;
@@ -42,6 +43,9 @@ import {
   Composition,
   ElementId,
   MovableId,
+  NativeId,
+  labelBackgroundBounds,
+  moveLabelBackground,
   TITLEBAR_HEIGHT,
 } from "@/lib/dmgly/model";
 
@@ -52,7 +56,6 @@ export function DmgCanvas({
   onChange,
   onBegin,
   onEnd,
-  artwork,
 }: {
   document: Composition;
   selected: ElementId[];
@@ -60,12 +63,22 @@ export function DmgCanvas({
   onChange: (d: Composition) => void;
   onBegin?: () => void;
   onEnd?: () => void;
-  artwork?: React.ReactNode;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const artboard = useRef<HTMLDivElement>(null);
   const drag = useRef<Gesture | null>(null);
   const keyboardMove = useRef(false);
+  const [labelWidths, setLabelWidths] = useState<LabelWidths>();
+  const [focusedBadge, setFocusedBadge] = useState<NativeId | null>(null);
+  useLayoutEffect(() => {
+    const labels = artboard.current?.querySelectorAll(".icon-label");
+    if (!labels) return;
+    const observer = new ResizeObserver(() => {
+      setLabelWidths(measureLabelWidths(d.app.name));
+    });
+    labels.forEach((label) => observer.observe(label));
+    return () => observer.disconnect();
+  }, [d.app.name]);
   const [transformFrame, setTransformFrame] = useState<SelectionFrame | null>(
     null,
   );
@@ -174,7 +187,16 @@ export function DmgCanvas({
     const start = drag.current;
     if (!start) return;
     const point = pointer(e);
-    if (start.kind === "move") {
+    if (start.kind === "badge") {
+      const id = start.ids[0] as NativeId;
+      const plate = start.document[id].labelBackground;
+      onChange(moveLabelBackground(
+        start.document, id,
+        plate.offsetX + point.x - start.pointer.x,
+        plate.offsetY + point.y - start.pointer.y,
+        labelWidths?.[id],
+      ));
+    } else if (start.kind === "move") {
       const id = start.ids[0],
         origin = start.document[id];
       const destination = snap(
@@ -283,7 +305,13 @@ export function DmgCanvas({
       keyboardMove.current = true;
     }
     const step = e.shiftKey ? 10 : 1;
-    onChange(moveSelection(d, ids, offset[0] * step, offset[1] * step));
+    const badgeId = e.target instanceof HTMLElement ? e.target.closest<HTMLElement>("[data-badge-id]")?.dataset.badgeId : undefined;
+    if (badgeId === "app" || badgeId === "applications") {
+      const plate = d[badgeId].labelBackground;
+      onChange(moveLabelBackground(d, badgeId, plate.offsetX + offset[0] * step, plate.offsetY + offset[1] * step, labelWidths?.[badgeId]));
+    } else {
+      onChange(moveSelection(d, ids, offset[0] * step, offset[1] * step));
+    }
   }
   function finishKeyboard() {
     if (keyboardMove.current) {
@@ -351,6 +379,36 @@ export function DmgCanvas({
         {content}
       </button>
     );
+  }
+  function badge(id: NativeId) {
+    if (!d[id].labelBackground.visible) return null;
+    const bounds = labelBackgroundBounds(d, id, labelWidths?.[id]);
+    return <button
+      key={`${id}-badge`}
+      type="button"
+      className="canvas-object label-badge"
+      data-badge-id={id}
+      aria-label={`${id === "app" ? "App" : "Applications"} label background`}
+      title="Drag to move label background"
+      style={{ left: bounds.x, top: bounds.y, width: bounds.width, height: bounds.height, borderRadius: d[id].labelBackground.radius }}
+      onFocus={() => { setFocusedBadge(id); onSelectionChange([id]); }}
+      onBlur={() => setFocusedBadge(null)}
+      onClick={(e) => e.stopPropagation()}
+      onPointerDown={(e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        e.currentTarget.focus({ preventScroll: true });
+        onBegin?.();
+        const frame = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2, width: bounds.width, height: bounds.height, rotation: 0 };
+        drag.current = { kind: "badge", document: d, ids: [id], pointer: pointer(e), center: frame, anchor: frame, frame };
+        e.currentTarget.setPointerCapture(e.pointerId);
+      }}
+      onPointerMove={updateGesture}
+      onPointerUp={() => finish()}
+      onPointerCancel={() => finish(true)}
+      onLostPointerCapture={() => finish()}
+    />;
   }
   return (
     <>
@@ -424,14 +482,7 @@ export function DmgCanvas({
                 style={{ height: d.window.height - TITLEBAR_HEIGHT }}
                 onClick={() => onSelectionChange(["background"])}
               >
-                {artwork || (
-                  <div
-                    className="artwork"
-                    style={{
-                      background: "linear-gradient(135deg,#ffefd5,#e9a26c)",
-                    }}
-                  />
-                )}
+                <div className="artwork" dangerouslySetInnerHTML={{ __html: artworkSvg(d, labelWidths) }} />
                 {item(
                   "app",
                   <>
@@ -489,7 +540,9 @@ export function DmgCanvas({
                     />,
                     "Installation arrow",
                   )}
-                {frame && (
+                {badge("app")}
+                {badge("applications")}
+                {frame && !focusedBadge && (
                   <SelectionHandles
                     frame={frame}
                     zoom={scale}
