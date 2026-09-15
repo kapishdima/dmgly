@@ -29,8 +29,8 @@ test("composition properties and Unicode survive a query-string round-trip", () 
   const document = createComposition();
   document.app.name = "Київ & Friends";
   document.window = { width: 800, height: 500 };
-  document.text = {
-    ...document.text,
+  document.texts[0] = {
+    ...document.texts[0],
     content: "こんにちは / & ? # +",
     rotation: -33,
     visible: false,

@@ -1,0 +1,21 @@
+import React, { useCallback, useState } from 'react';
+import { registerRoot, Composition, AbsoluteFill, useCurrentFrame, delayRender, continueRender } from 'remotion';
+import { Dithering } from '@paper-design/shaders-react';
+
+const frames = 1047;
+function Background() {
+  const frame = useCurrentFrame();
+  const [handle] = useState(() => delayRender('Wait for Dithering'));
+  const ready = useCallback((element: HTMLDivElement | null) => {
+    if (element) requestAnimationFrame(() => requestAnimationFrame(() => continueRender(handle)));
+  }, [handle]);
+  // Warp repeats at u_time = 4π. 1047 frames at 20 fps matches speed 0.24
+  // within 0.02%, with a complete forward cycle and no duplicate end frame.
+  const time = 4 * Math.PI * 1000 * frame / frames;
+  return <AbsoluteFill ref={ready} style={{ background: '#250240' }}>
+    <Dithering width={642} height={406} minPixelRatio={1} maxPixelCount={642 * 406}
+      speed={0} frame={time} colorBack="#250240" colorFront="#7f18c3"
+      shape="warp" type="4x4" size={2.5} scale={1.04} rotation={0} offsetX={0} offsetY={0} />
+  </AbsoluteFill>;
+}
+registerRoot(() => <Composition id="Dithering" component={Background} width={642} height={406} fps={20} durationInFrames={frames} />);

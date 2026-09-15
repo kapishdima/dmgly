@@ -5,14 +5,14 @@ export function loadImage(source: string): Promise<HTMLImageElement> {
     const image = new Image();
     image.onload = () => resolve(image);
     image.onerror = () =>
-      reject(new Error("This image could not be opened. Try a PNG, JPEG, or WebP file."));
+      reject(new Error("This image could not be opened. Try a PNG, JPEG, WebP, or GIF file."));
     image.src = source;
   });
 }
-export async function readImageAsset(file: File): Promise<ImageAsset> {
-  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type))
-    throw new Error("Choose a PNG, JPEG, or WebP image. ICNS and SVG are not supported yet.");
-  if (file.size > MAX_UPLOAD_BYTES) throw new Error("Choose an image smaller than 10 MB.");
+export async function readImageAsset(file: File, allowGif = false): Promise<ImageAsset> {
+  if (!["image/png", "image/jpeg", "image/webp", ...(allowGif ? ["image/gif"] : [])].includes(file.type))
+    throw new Error(allowGif ? "Choose a PNG, JPEG, WebP, or GIF image." : "Choose a PNG, JPEG, or WebP image for the app icon.");
+  if (file.type !== "image/gif" && file.size > MAX_UPLOAD_BYTES) throw new Error("Choose an image smaller than 10 MB.");
   const source = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));

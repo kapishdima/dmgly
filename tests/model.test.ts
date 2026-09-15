@@ -9,7 +9,7 @@ import {
 test("defaults and Unicode user data round-trip", () => {
   const d = createComposition();
   d.app.name = "Київ & Friends";
-  d.text.content = "こんにちは";
+  d.texts[0].content = "こんにちは";
   expect(parseComposition(JSON.parse(JSON.stringify(d)))).toEqual(d);
 });
 test("invalid persisted state is rejected", () => {
@@ -30,6 +30,6 @@ test("resizing constrains native icons and snapshot stays isolated", () => {
   const small = resizeWindow(d, 480, 320);
   expect(small.applications.x).toBe(408);
   const copy = snapshot(d);
-  copy.text.visible = false;
-  expect(d.text.visible).toBe(true);
+  copy.texts[0].visible = false;
+  expect(d.texts[0].visible).toBe(true);
 });

@@ -177,6 +177,7 @@
 }
 .preview-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   min-height: 64px;
@@ -598,6 +599,58 @@
   gap: 10px;
   min-width: 0;
 }
+.text-blocks {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.text-blocks-heading,
+.text-block-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.text-blocks-heading {
+  justify-content: space-between;
+}
+.text-blocks-heading .field-label {
+  padding-top: 0;
+}
+.text-block-list {
+  display: grid;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.text-block-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+}
+.text-block-select:hover,
+.text-block-select[aria-pressed="true"] {
+  background: var(--paper);
+}
+.text-block-select > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.text-block-hidden {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 11px;
+}
 .dmgly .dialkit-root {
   --dial-row-height: 40px;
   --dial-radius: var(--editor-radius);
@@ -737,7 +790,7 @@
   justify-content: center;
   gap: 10px;
   position: relative;
-  min-height: 168px;
+  min-height: 140px;
   padding: 20px 16px;
   border: 1px dashed rgb(0 0 0 / 18%);
   border-radius: var(--editor-radius);
@@ -759,20 +812,42 @@
   outline: 2px solid #65655f;
   outline-offset: 2px;
 }
-.upload-file {
-  overflow-wrap: anywhere;
-  max-width: 100%;
+.upload-title {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
   text-align: center;
 }
 .upload-details {
   display: flex;
   flex-direction: column;
+  max-width: 100%;
   gap: 4px;
   text-align: center;
 }
+.upload-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+}
+.upload-file {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.upload-size {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.upload-summary,
 .upload-hint {
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #56564f;
 }
 .error-message {
   font-size: 13px;
@@ -1349,3 +1424,10 @@ html[data-dmgly-input="keyboard"] .export-dialog.motion-dialog[data-starting-sty
 html[data-dmgly-input="keyboard"] .motion-backdrop[data-starting-style] {
   opacity: 1;
 }
+
+.gif-background { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.gif-preview-error { position: absolute; bottom: 8px; left: 8px; padding: 8px; background: white; color: #a02222; font-size: 12px; }
+.export-progress { padding: 0 24px 16px; font-size: 13px; color: var(--muted-foreground); }
+.export-progress progress { display: block; width: 100%; margin-top: 8px; }
+
+.export-progress a { display: flex; width: fit-content; margin-top: 8px; text-decoration: none; }

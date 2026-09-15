@@ -39,14 +39,14 @@ import { aiPrompt, fenced } from "../lib/dmgly/export/ai-prompt";
 test("AI prompts use the selected target snapshot and safe data fences", () => {
   const d = createComposition();
   d.app.name = "My ``` App";
-  d.text.visible = false;
+  d.texts[0].visible = false;
   for (const get of [electronConfig, tauriConfig, nativeConfig]) {
     const c = get(d),
       prompt = aiPrompt(d, c);
     expect(prompt).toContain(c.content);
     expect(prompt).toContain('"textBakedIn": false');
     expect(prompt).toContain(c.filename);
-    expect(prompt).toContain("assets/dmg-background.png");
+    expect(prompt).toContain("assets/dmg-background.gif");
   }
   expect(fenced("```\ntext")).toStartWith("````\n");
 });
@@ -55,7 +55,7 @@ test("AI prompts use the selected target snapshot and safe data fences", () => {
 test("the default Electron configuration matches the requested composition", () => {
   const config = JSON.parse(electronConfig(createComposition()).content);
   expect(config.dmg).toEqual({
-    background: "build/dmgly/assets/dmg-background.png",
+    background: "build/dmgly/assets/dmg-background.gif",
     window: { width: 642, height: 406 },
     iconSize: 128,
     contents: [

@@ -1,3 +1,4 @@
+import { backgroundAssetPath } from "../media";
 import { Composition, snapshot } from "../model";
 import { ExportConfig, TARGET_NAMES } from "./contract";
 export function fenced(value: string, language = "") {
@@ -13,8 +14,9 @@ export function aiPrompt(document: Composition, config: ExportConfig): string {
     appPosition: { x: d.app.x, y: d.app.y },
     applicationsPosition: { x: d.applications.x, y: d.applications.y },
     iconSize: 128,
-    background: "assets/dmg-background.png",
-    textBakedIn: d.text.visible,
+    background: backgroundAssetPath(d),
+    textBakedIn: d.texts.some((text) => text.visible),
+    textCount: d.texts.filter((text) => text.visible).length,
     arrowBakedIn: d.arrow.visible,
     labelBackgroundsBakedIn: {
       app: d.app.labelBackground.visible,

@@ -1,4 +1,4 @@
-import { Composition, labelBackgroundBounds } from "./model";
+import { Composition, TextElement, labelBackgroundBounds } from "./model";
 import type { LabelWidths } from "./label-metrics";
 export function escapeXml(s: string) {
   return s.replace(
@@ -27,15 +27,17 @@ export function backgroundMarkup(d: Composition): string {
   }
   let result = `<rect width="${w}" height="${h}" fill="${b.solid}"/>`;
   if (b.mode === "image" && b.image) {
-    const fit =
-      b.fit === "fill"
-        ? Math.max(w / b.image.width, h / b.image.height)
-        : Math.min(w / b.image.width, h / b.image.height);
-    const iw = b.image.width * fit * b.scale,
-      ih = b.image.height * fit * b.scale;
-    result += `<image href="${escapeXml(b.image.data)}" x="${(w - iw) / 2 + (b.x * w) / 100}" y="${(h - ih) / 2 + (b.y * h) / 100}" width="${iw}" height="${ih}"/>`;
+    const { x, y, width, height } = backgroundImageBounds(d);
+    result += `<image href="${escapeXml(b.image.data)}" x="${x}" y="${y}" width="${width}" height="${height}"/>`;
   }
   return result;
+}
+export function backgroundImageBounds(d: Composition) {
+  const b = d.background, image = b.image!;
+  const w = d.window.width, h = d.window.height;
+  const fit = b.fit === "fill" ? Math.max(w / image.width, h / image.height) : Math.min(w / image.width, h / image.height);
+  const width = image.width * fit * b.scale, height = image.height * fit * b.scale;
+  return { x: (w - width) / 2 + b.x * w / 100, y: (h - height) / 2 + b.y * h / 100, width, height };
 }
 export function backgroundSvg(d: Composition) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${d.window.width}" height="${d.window.height}" viewBox="0 0 ${d.window.width} ${d.window.height}">${backgroundMarkup(d)}</svg>`;
@@ -59,32 +61,32 @@ export function arrowPath(d: Composition) {
   }
   return `M ${l} 0 L ${r} 0 M ${r - 18} -15 L ${r} 0 L ${r - 18} 15`;
 }
-export function textBounds(d: Composition) {
-  const lines = d.text.content.split("\n");
+export function textBounds(text: TextElement) {
+  const lines = text.content.split("\n");
   return {
-    width: Math.min(900, Math.max(40, ...lines.map((l) => l.length * d.text.size * 0.7))),
-    height: Math.max(24, lines.length * d.text.size * 1.3),
+    width: Math.min(900, Math.max(40, ...lines.map((l) => l.length * text.size * 0.7))),
+    height: Math.max(24, lines.length * text.size * 1.3),
   };
 }
 export function decorationsMarkup(d: Composition): string {
   let result = "";
   if (d.arrow.visible)
     result += `<g transform="translate(${d.arrow.x} ${d.arrow.y}) rotate(${d.arrow.rotation}) scale(${d.arrow.scale})"><path d="${arrowPath(d)}" fill="none" stroke="${d.arrow.color}" stroke-width="${d.arrow.thickness}" stroke-linecap="round" stroke-linejoin="round"/></g>`;
-  if (d.text.visible) {
-    const t = d.text,
-      lines = t.content.split("\n"),
-      box = textBounds(d),
+  for (const t of d.texts) {
+    if (!t.visible) continue;
+    const lines = t.content.split("\n"),
+      box = textBounds(t),
       anchor = t.align === "left" ? "start" : t.align === "right" ? "end" : "middle",
       x = t.x + (t.align === "left" ? -box.width / 2 : t.align === "right" ? box.width / 2 : 0),
       font = { sans: "Arial, sans-serif", serif: "Georgia, serif", mono: "Courier New, monospace" }[
         t.font
       ];
-    result += `<text transform="rotate(${t.rotation} ${t.x} ${t.y})" font-family="${font}" font-size="${t.size}" fill="${t.color}" text-anchor="${anchor}" dominant-baseline="central" xml:space="preserve">${lines.map((line, i) => `<tspan x="${x}" y="${t.y + (i - (lines.length - 1) / 2) * t.size * 1.3}">${escapeXml(line)}</tspan>`).join("")}</text>`;
+    result += `<text data-text-id="${t.id}" transform="rotate(${t.rotation} ${t.x} ${t.y})" font-family="${font}" font-size="${t.size}" fill="${t.color}" text-anchor="${anchor}" dominant-baseline="central" xml:space="preserve">${lines.map((line, i) => `<tspan x="${x}" y="${t.y + (i - (lines.length - 1) / 2) * t.size * 1.3}">${escapeXml(line)}</tspan>`).join("")}</text>`;
   }
   return result;
 }
-export function artworkSvg(d: Composition, labelWidths?: LabelWidths) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${d.window.width}" height="${d.window.height}" viewBox="0 0 ${d.window.width} ${d.window.height}">${backgroundMarkup(d)}${decorationsMarkup(d)}${labelBackgroundsMarkup(d, labelWidths)}</svg>`;
+export function artworkSvg(d: Composition, labelWidths?: LabelWidths, decorationsOnly = false) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${d.window.width}" height="${d.window.height}" viewBox="0 0 ${d.window.width} ${d.window.height}">${decorationsOnly ? "" : backgroundMarkup(d)}${decorationsMarkup(d)}${labelBackgroundsMarkup(d, labelWidths)}</svg>`;
 }
 
 export function labelBackgroundsMarkup(d: Composition, labelWidths?: LabelWidths): string {

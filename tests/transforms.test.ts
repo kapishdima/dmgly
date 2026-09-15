@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { artworkSvg } from "../lib/dmgly/artwork";
-import { createComposition, parseComposition } from "../lib/dmgly/model";
+import { createComposition, parseComposition, getElement } from "../lib/dmgly/model";
 import { createHistory, reduceHistory } from "../lib/dmgly/history";
 import {
   canTransform,
@@ -19,7 +19,7 @@ test("Shift selection toggles objects and select all excludes background and hid
   expect(selectElement(["app", "arrow"], "app", true)).toEqual(["arrow"]);
   expect(selectElement(["app", "arrow"], "text")).toEqual(["text"]);
   const d = createComposition();
-  d.text.visible = false;
+  d.texts[0].visible = false;
   expect(visibleElements(d)).toEqual(["app", "applications", "arrow"]);
 });
 
@@ -30,8 +30,8 @@ test("group movement stops at the boundary without changing relative positions",
   expect(next.app.x).toBe(72);
   expect(next.app.y).toBe(72);
   for (const id of ids) {
-    expect(next[id].x - next.app.x).toBe(d[id].x - d.app.x);
-    expect(next[id].y - next.app.y).toBe(d[id].y - d.app.y);
+    expect(getElement(next, id).x - next.app.x).toBe(getElement(d, id).x - d.app.x);
+    expect(getElement(next, id).y - next.app.y).toBe(getElement(d, id).y - d.app.y);
   }
   expect(d.app).toMatchObject({ x: 95, y: 90 });
 });
@@ -41,13 +41,13 @@ test("group rotation preserves distances and is baked into exported artwork", ()
   const ids = ["text", "arrow"] as const;
   const frame = selectionFrame(d, [...ids])!;
   const next = rotateSelection(d, [...ids], frame, 30);
-  expect(next.text.rotation).toBe(30);
+  expect(next.texts[0].rotation).toBe(30);
   expect(next.arrow.rotation).toBe(64);
   expect(
-    Math.hypot(next.text.x - next.arrow.x, next.text.y - next.arrow.y),
-  ).toBeCloseTo(Math.hypot(d.text.x - d.arrow.x, d.text.y - d.arrow.y));
+    Math.hypot(next.texts[0].x - next.arrow.x, next.texts[0].y - next.arrow.y),
+  ).toBeCloseTo(Math.hypot(d.texts[0].x - d.arrow.x, d.texts[0].y - d.arrow.y));
   expect(artworkSvg(next)).toContain(
-    `rotate(30 ${next.text.x} ${next.text.y})`,
+    `rotate(30 ${next.texts[0].x} ${next.texts[0].y})`,
   );
   expect(artworkSvg(next)).toContain("rotate(64) scale(1)");
   expect(parseComposition(next)).toEqual(next);
@@ -77,25 +77,25 @@ test("scaling a rotated arrow keeps the opposite corner anchored and scales its 
 test("text and arrow group scaling uses one bounded ratio and leaves native Finder icons intact", () => {
   const d = createComposition();
   const next = scaleSelection(d, ["text", "arrow"], { x: 0, y: 0 }, 1.2);
-  expect(next.text.size).toBeCloseTo(d.text.size * 1.2);
+  expect(next.texts[0].size).toBeCloseTo(d.texts[0].size * 1.2);
   expect(next.arrow.scale).toBeCloseTo(1.2);
-  expect(next.arrow.x - next.text.x).toBeCloseTo((d.arrow.x - d.text.x) * 1.2);
+  expect(next.arrow.x - next.texts[0].x).toBeCloseTo((d.arrow.x - d.texts[0].x) * 1.2);
   expect(canTransform(["text", "app"])).toBe(false);
   expect(scaleSelection(d, ["app"], d.app, 2)).toBe(d);
   expect(rotateSelection(d, ["applications"], d.applications, 90)).toBe(d);
-  expect(scaleSelection(d, ["text"], d.text, 100).text.size).toBe(64);
-  expect(scaleSelection(d, ["text"], d.text, -2).text.size).toBe(12);
+  expect(scaleSelection(d, ["text"], d.texts[0], 100).texts[0].size).toBe(64);
+  expect(scaleSelection(d, ["text"], d.texts[0], -2).texts[0].size).toBe(12);
 });
 
 test("legacy drafts gain transform defaults without altering their composition", () => {
   const d = createComposition();
   const text = Object.fromEntries(
-    Object.entries(d.text).filter(([key]) => key !== "rotation"),
+    Object.entries(d.texts[0]).filter(([key]) => key !== "rotation"),
   );
   const arrow = Object.fromEntries(
     Object.entries(d.arrow).filter(([key]) => key !== "scale"),
   );
-  expect(parseComposition({ ...d, text, arrow })).toEqual(d);
+  expect(parseComposition({ ...d, texts: [text], arrow })).toEqual(d);
 });
 
 test("one transformation gesture is one undo step", () => {

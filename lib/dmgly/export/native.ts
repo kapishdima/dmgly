@@ -1,3 +1,4 @@
+import { backgroundAssetPath } from "../media";
 import { Composition, snapshot } from "../model";
 import { assetPaths, commonInstructions, ExportConfig, iconInstructions } from "./contract";
 export function shellQuote(value: string) {
@@ -35,7 +36,7 @@ export function nativeConfig(document: Composition): ExportConfig {
   return {
     target: "native",
     filename: "build-dmg.sh",
-    content: lines.join("\n"),
+    content: lines.join("\n").replaceAll("assets/dmg-background.png", backgroundAssetPath(d)),
     assets: assetPaths(d),
     warnings: [
       "This packages an existing .app on macOS. The real app filename supplies the volume name and must use letters, numbers, spaces, dots, underscores, or hyphens.",

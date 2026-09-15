@@ -74,3 +74,8 @@ test("upgrading a legacy database preserves its draft without restoring or updat
   });
   expect(legacy).toEqual({ legacy: true });
 });
+
+test("GIF assets survive local storage with their original bytes", async () => {
+  const asset = { name: "animation.gif", width: 640, height: 400, data: "data:image/gif;base64," + "AAAA".repeat(4_000_000) };
+  expect(await loadAsset(await saveAsset(asset))).toEqual(asset);
+});

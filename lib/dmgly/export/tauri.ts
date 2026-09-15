@@ -1,3 +1,4 @@
+import { backgroundAssetPath } from "../media";
 import { Composition, snapshot } from "../model";
 import { assetPaths, commonInstructions, ExportConfig, iconInstructions } from "./contract";
 export function tauriConfig(document: Composition): ExportConfig {
@@ -6,7 +7,7 @@ export function tauriConfig(document: Composition): ExportConfig {
       bundle: {
         macOS: {
           dmg: {
-            background: "dmgly/assets/dmg-background.png",
+            background: `dmgly/${backgroundAssetPath(d)}`,
             windowSize: d.window,
             appPosition: { x: d.app.x, y: d.app.y },
             applicationFolderPosition: { x: d.applications.x, y: d.applications.y },

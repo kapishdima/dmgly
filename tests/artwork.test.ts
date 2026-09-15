@@ -3,11 +3,11 @@ import { createComposition } from "../lib/dmgly/model";
 import { arrowPath, artworkSvg } from "../lib/dmgly/artwork";
 test("export markup escapes user text and excludes hidden decorations", () => {
   const d = createComposition();
-  d.text.content = '<script>alert("x")</script>';
+  d.texts[0].content = '<script>alert("x")</script>';
   const svg = artworkSvg(d);
   expect(svg).not.toContain("<script>");
   expect(svg).toContain("&lt;script&gt;");
-  d.text.visible = false;
+  d.texts[0].visible = false;
   d.arrow.visible = false;
   expect(artworkSvg(d)).not.toContain("<text");
   expect(artworkSvg(d)).not.toContain("<path");

@@ -44,7 +44,6 @@ export function serializeSettings(settings: UrlSettings): string {
     "app",
     "applications",
     "background",
-    "text",
     "arrow",
   ] as const) {
     const changes = Object.fromEntries(
@@ -58,12 +57,12 @@ export function serializeSettings(settings: UrlSettings): string {
     );
     if (Object.keys(changes).length) delta[key] = changes;
   }
+  if (JSON.stringify(settings.texts) !== JSON.stringify(defaultSettings.texts)) delta.texts = settings.texts;
   return JSON.stringify(delta);
 }
 
 export function parseSettings(raw: string): UrlSettings | null {
   try {
-    if (raw.length > 10000) return null;
     const value = JSON.parse(raw);
     if (!value || Array.isArray(value) || value.version !== 1) return null;
     const merged: Record<string, unknown> = { version: 1 };
@@ -72,7 +71,6 @@ export function parseSettings(raw: string): UrlSettings | null {
       "app",
       "applications",
       "background",
-      "text",
       "arrow",
     ] as const) {
       if (
@@ -84,6 +82,10 @@ export function parseSettings(raw: string): UrlSettings | null {
         return null;
       merged[key] = { ...defaultSettings[key], ...value[key] };
     }
+    if ("text" in value && (!value.text || typeof value.text !== "object" || Array.isArray(value.text))) return null;
+    merged.texts = "texts" in value ? value.texts
+      : "text" in value ? [{ ...defaultSettings.texts[0], ...value.text, id: "text" }]
+      : defaultSettings.texts;
     const parsed = settingsSchema.safeParse(merged);
     return parsed.success ? parsed.data : null;
   } catch {

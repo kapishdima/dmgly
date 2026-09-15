@@ -27,10 +27,21 @@ const asset = z.object({
   name: z.string().max(255),
   data: z
     .string()
-    .max(15_000_000)
-    .regex(/^data:image\/(png|jpeg|webp);base64,/),
+    .regex(/^data:image\/(png|jpeg|webp|gif);base64,/)
+    .refine((data) => data.startsWith("data:image/gif;") || data.length <= 15_000_000, "Still image data is too large."),
   width: number(1, 8192),
   height: number(1, 8192),
+});
+export type TextId = "text" | `text:${string}`;
+export const textSchema = position.extend({
+  id: z.string().regex(/^text(?::[a-zA-Z0-9-]+)?$/).transform((id) => id as TextId),
+  visible: z.boolean(),
+  content: z.string().max(500),
+  font: z.enum(["sans", "serif", "mono"]),
+  size: number(12, 64),
+  color,
+  align: z.enum(["left", "center", "right"]),
+  rotation: number(-180, 180).default(0),
 });
 export const compositionSchema = z.object({
   version: z.literal(1),
@@ -64,15 +75,7 @@ export const compositionSchema = z.object({
     x: number(-100, 100),
     y: number(-100, 100),
   }),
-  text: position.extend({
-    visible: z.boolean(),
-    content: z.string().max(500),
-    font: z.enum(["sans", "serif", "mono"]),
-    size: number(12, 64),
-    color,
-    align: z.enum(["left", "center", "right"]),
-    rotation: number(-180, 180).default(0),
-  }),
+  texts: z.array(textSchema).refine((texts) => new Set(texts.map((text) => text.id)).size === texts.length, "Text IDs must be unique."),
   arrow: position.extend({
     visible: z.boolean(),
     shape: z.enum(["straight", "curved", "chevron"]),
@@ -85,7 +88,7 @@ export const compositionSchema = z.object({
 });
 export type Composition = z.infer<typeof compositionSchema>;
 export type ImageAsset = z.infer<typeof asset>;
-export type ElementId = "background" | "app" | "applications" | "text" | "arrow";
+export type ElementId = "background" | "app" | "applications" | TextId | "arrow";
 export type MovableId = Exclude<ElementId, "background">;
 export const FONT_FAMILIES = {
   sans: "Arial, sans-serif",
@@ -115,7 +118,8 @@ export function createComposition(): Composition {
       x: 0,
       y: 0,
     },
-    text: {
+    texts: [{
+      id: "text",
       visible: true,
       content: "Drag to Applications to install",
       font: "sans",
@@ -125,7 +129,7 @@ export function createComposition(): Composition {
       rotation: 0,
       x: 153,
       y: 273,
-    },
+    }],
     arrow: {
       visible: true,
       shape: "curved",
@@ -140,6 +144,10 @@ export function createComposition(): Composition {
   };
 }
 export function parseComposition(value: unknown): Composition {
+  if (value && typeof value === "object" && "text" in value && !("texts" in value)) {
+    const legacy = value as Record<string, unknown>;
+    return compositionSchema.parse({ ...legacy, texts: [{ ...(legacy.text as object), id: "text" }] });
+  }
   return compositionSchema.parse(value);
 }
 export const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
@@ -181,14 +189,10 @@ export function movementLimits(d: Composition, id: MovableId) {
 }
 export function moveElement(d: Composition, id: MovableId, x: number, y: number): Composition {
   const limits = movementLimits(d, id);
-  return {
-    ...d,
-    [id]: {
-      ...d[id],
-      x: Math.round(clamp(x, limits.minX, limits.maxX)),
-      y: Math.round(clamp(y, limits.minY, limits.maxY)),
-    },
-  };
+  return updateElement(d, id, {
+    x: Math.round(clamp(x, limits.minX, limits.maxX)),
+    y: Math.round(clamp(y, limits.minY, limits.maxY)),
+  });
 }
 export function resizeWindow(d: Composition, width: number, height: number): Composition {
   let next = {
@@ -198,12 +202,47 @@ export function resizeWindow(d: Composition, width: number, height: number): Com
       height: Math.round(clamp(height, 320, 900)),
     },
   };
-  for (const id of ["app", "applications", "text", "arrow"] as const)
-    next = moveElement(next, id, next[id].x, next[id].y);
+  for (const id of ["app", "applications", "arrow", ...d.texts.map((text) => text.id)] as MovableId[]) {
+    const element = getElement(next, id);
+    next = moveElement(next, id, element.x, element.y);
+  }
   for (const id of ["app", "applications"] as const)
     next = moveLabelBackground(next, id, next[id].labelBackground.offsetX, next[id].labelBackground.offsetY);
   return next;
 }
 export function snapshot(d: Composition): Composition {
   return parseComposition(structuredClone(d));
+}
+
+export type TextElement = z.infer<typeof textSchema>;
+export function isTextId(id: ElementId): id is TextId {
+  return id === "text" || id.startsWith("text:");
+}
+export function getText(d: Composition, id: TextId) {
+  return d.texts.find((text) => text.id === id);
+}
+export function getElement(d: Composition, id: MovableId) {
+  if (!isTextId(id)) return d[id];
+  const text = getText(d, id);
+  if (!text) throw new Error(`Text element ${id} does not exist.`);
+  return text;
+}
+export function updateText(d: Composition, id: TextId, patch: Partial<Omit<TextElement, "id">>): Composition {
+  return { ...d, texts: d.texts.map((text) => text.id === id ? { ...text, ...patch } : text) };
+}
+export function updateElement(d: Composition, id: MovableId, patch: { x?: number; y?: number; rotation?: number; size?: number; scale?: number; visible?: boolean }): Composition {
+  return isTextId(id) ? updateText(d, id, patch) : { ...d, [id]: { ...d[id], ...patch } };
+}
+export function addText(d: Composition): { document: Composition; id: TextId } {
+  const id: TextId = `text:${crypto.randomUUID()}`;
+  const offset = (d.texts.length % 8) * 16;
+  const text: TextElement = {
+    id, visible: true, content: "New text", font: "sans", size: 18,
+    color: "#ffffff", align: "center", rotation: 0,
+    x: d.window.width / 2 + offset, y: (d.window.height - TITLEBAR_HEIGHT) / 2 + offset,
+  };
+  return { document: moveElement({ ...d, texts: [...d.texts, text] }, id, text.x, text.y), id };
+}
+export function removeText(d: Composition, id: TextId): Composition {
+  return { ...d, texts: d.texts.filter((text) => text.id !== id) };
 }

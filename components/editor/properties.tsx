@@ -11,7 +11,8 @@ import {
   ArrowDown01Icon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
-import { ColorControl, SelectControl, Slider, Toggle, TextControl } from "dialkit";
+import { SelectControl, Slider, Toggle, TextControl } from "dialkit";
+import { ColorControl } from "./color-control";
 import "dialkit/styles.css";
 import { AssetUpload } from "./asset-upload";
 import {
@@ -19,24 +20,19 @@ import {
   ElementId,
   moveElement,
   movementLimits,
+  TextId,
+  addText,
+  removeText,
+  getText,
+  getElement,
+  isTextId,
+  updateText,
+  updateElement,
   moveLabelBackground,
   resizeWindow,
 } from "@/lib/dmgly/model";
 import { measureLabelWidths } from "@/lib/dmgly/label-metrics";
 
-export function hexColor(value: string): string {
-  const c = document.createElement("canvas").getContext("2d")!;
-  c.fillStyle = "#000000";
-  c.fillStyle = value;
-  c.fillRect(0, 0, 1, 1);
-  return (
-    "#" +
-    Array.from(c.getImageData(0, 0, 1, 1).data)
-      .slice(0, 3)
-      .map((v) => v.toString(16).padStart(2, "0"))
-      .join("")
-  );
-}
 function LabelBackgroundProperties({ document: d, id, onChange }: {
   document: Composition;
   id: "app" | "applications";
@@ -57,7 +53,7 @@ function LabelBackgroundProperties({ document: d, id, onChange }: {
       <p className="field-label" id={`${id}-label-background-heading`}>Label background</p>
       <Toggle label="Visible" checked={plate.visible} onChange={(visible) => update({ visible })} />
       {plate.visible && <>
-        <ColorControl label="Background color" value={plate.color} onChange={(value) => update({ color: hexColor(value) })} />
+        <ColorControl label="Background color" value={plate.color} onChange={(value) => update({ color: value })} />
         <Slider label="Opacity" value={plate.opacity} min={0} max={100} step={1} onChange={(opacity) => update({ opacity })} />
         <Toggle label="Fit to text" checked={plate.autoSize} onChange={(autoSize) => update({ autoSize,
           ...(autoSize ? {} : { width: Math.min(164, measureLabelWidths(d.app.name)[id]) + 8, height: 24 }),
@@ -96,7 +92,7 @@ export function BackgroundProperties({
             className={b.mode === mode ? "active" : ""}
             onClick={() => update({ mode })}
           >
-            {mode[0].toUpperCase() + mode.slice(1)}
+            {mode === "image" ? "Image / GIF" : mode[0].toUpperCase() + mode.slice(1)}
           </button>
         ))}
       </div>
@@ -104,13 +100,14 @@ export function BackgroundProperties({
         <ColorControl
           label="Color"
           value={b.solid}
-          onChange={(value) => update({ solid: hexColor(value) })}
+          onChange={(value) => update({ solid: value })}
         />
       )}
       {b.mode === "image" && (
         <>
           <AssetUpload
-            label="Upload background"
+            label="Upload image or GIF"
+            allowGif
             value={b.image}
             onChange={(image) => update({ image })}
           />
@@ -152,7 +149,7 @@ export function BackgroundProperties({
           <ColorControl
             label="Fill color"
             value={b.solid}
-            onChange={(value) => update({ solid: hexColor(value) })}
+            onChange={(value) => update({ solid: value })}
           />
         </>
       )}
@@ -191,7 +188,7 @@ export function BackgroundProperties({
                     gradient: {
                       ...b.gradient,
                       stops: b.gradient.stops.map((s) =>
-                        s.id === stop.id ? { ...s, color: hexColor(color) } : s,
+                        s.id === stop.id ? { ...s, color: color } : s,
                       ),
                     },
                   })
@@ -264,25 +261,25 @@ export function DecorationProperties({
   onChange,
 }: {
   document: Composition;
-  id: "text" | "arrow";
+  id: TextId | "arrow";
   onChange: (d: Composition) => void;
 }) {
-  const t = d.text,
+  const t = isTextId(id) ? getText(d, id) : undefined,
     a = d.arrow;
   return (
     <div className="dialkit-root control-stack" data-theme="light">
       <Toggle
         label="Visible"
-        checked={d[id].visible}
-        onChange={(visible) => onChange({ ...d, [id]: { ...d[id], visible } })}
+        checked={(t ?? a).visible}
+        onChange={(visible) => onChange(updateElement(d, id, { visible }))}
       />
-      {id === "text" ? (
+      {t ? (
         <>
           <TextControl
             label="Text"
             value={t.content}
             onChange={(content) =>
-              onChange({ ...d, text: { ...t, content: content.slice(0, 500) } })
+              onChange(updateText(d, t.id, { content: content.slice(0, 500) }))
             }
           />
           <SelectControl
@@ -293,7 +290,7 @@ export function DecorationProperties({
               { value: "serif", label: "Serif" },
               { value: "mono", label: "Monospace" },
             ]}
-            onChange={(font) => onChange({ ...d, text: { ...t, font: font as typeof t.font } })}
+            onChange={(font) => onChange(updateText(d, t.id, { font: font as typeof t.font }))}
           />
           <Slider
             label="Size"
@@ -301,18 +298,18 @@ export function DecorationProperties({
             max={64}
             step={1}
             value={t.size}
-            onChange={(size) => onChange({ ...d, text: { ...t, size } })}
+            onChange={(size) => onChange(updateText(d, t.id, { size }))}
           />
           <ColorControl
             label="Color"
             value={t.color}
-            onChange={(value) => onChange({ ...d, text: { ...t, color: hexColor(value) } })}
+            onChange={(value) => onChange(updateText(d, t.id, { color: value }))}
           />
           <SelectControl
             label="Align"
             value={t.align}
             options={["left", "center", "right"]}
-            onChange={(align) => onChange({ ...d, text: { ...t, align: align as typeof t.align } })}
+            onChange={(align) => onChange(updateText(d, t.id, { align: align as typeof t.align }))}
           />
           <Slider
             label="Rotation"
@@ -320,7 +317,7 @@ export function DecorationProperties({
             min={-180}
             max={180}
             step={1}
-            onChange={(rotation) => onChange({ ...d, text: { ...t, rotation } })}
+            onChange={(rotation) => onChange(updateText(d, t.id, { rotation }))}
           />
         </>
       ) : (
@@ -336,7 +333,7 @@ export function DecorationProperties({
           <ColorControl
             label="Color"
             value={a.color}
-            onChange={(value) => onChange({ ...d, arrow: { ...a, color: hexColor(value) } })}
+            onChange={(value) => onChange({ ...d, arrow: { ...a, color: value } })}
           />
           <Slider
             label="Width"
@@ -402,7 +399,9 @@ export function Inspector({
     arrow: "Arrow",
   };
   const native = selected === "app" || selected === "applications";
-  const limits = selected === "background" ? null : movementLimits(d, selected);
+  const tab = isTextId(selected) ? "text" : selected;
+  const element = selected === "background" ? undefined : isTextId(selected) ? getText(d, selected) : getElement(d, selected);
+  const limits = selected !== "background" && element ? movementLimits(d, selected) : null;
   const scroll = useRef<HTMLDivElement>(null);
   useEffect(() => {
     scroll.current?.scrollTo({ top: 0 });
@@ -428,13 +427,13 @@ export function Inspector({
       onBlurCapture={onEnd}
     >
       <div className="element-tabs" aria-label="Select element">
-        {(Object.keys(labels) as ElementId[]).map((id) => (
+        {(Object.keys(labels) as (keyof typeof labels)[]).map((id) => (
           <button
             type="button"
             key={id}
-            className={selected === id ? "active" : ""}
-            aria-pressed={selected === id}
-            onClick={() => onSelect(id)}
+            className={tab === id ? "active" : ""}
+            aria-pressed={tab === id}
+            onClick={() => onSelect(id === "text" ? d.texts[0]?.id ?? "text" : id)}
           >
             <Icon icon={icons[id]} />
             <span>{labels[id]}</span>
@@ -458,28 +457,55 @@ export function Inspector({
             />
           </div>
         )}
-        {(selected === "text" || selected === "arrow") && (
-          <DecorationProperties document={d} id={selected} onChange={onChange} />
+        {isTextId(selected) && (
+          <div className="text-blocks">
+            <div className="text-blocks-heading">
+              <p className="field-label">Text blocks · {d.texts.length}</p>
+              <button type="button" className="toolbar-button" onClick={() => {
+                onEnd?.();
+                const next = addText(d);
+                onChange(next.document);
+                onSelect(next.id);
+              }}><Icon icon={Add01Icon} />Add text</button>
+            </div>
+            {d.texts.length ? <div className="text-block-list" aria-label="Text blocks">
+              {d.texts.map((text, index) => <div className="text-block-row" key={text.id}>
+                <button type="button" className="text-block-select" aria-pressed={selected === text.id} onClick={() => onSelect(text.id)}>
+                  <span>{text.content.trim() || `Text ${index + 1}`}</span>
+                  {!text.visible && <span className="text-block-hidden">Hidden</span>}
+                </button>
+                <button type="button" className="icon-button" aria-label={`Delete text ${index + 1}`} title="Delete text" onClick={() => {
+                  onEnd?.();
+                  const next = removeText(d, text.id);
+                  onChange(next);
+                  if (selected === text.id) onSelect(next.texts[Math.min(index, next.texts.length - 1)]?.id ?? "text");
+                }}><Icon icon={Cancel01Icon} /></button>
+              </div>)}
+            </div> : <p className="control-note">Add your first text block to the preview.</p>}
+          </div>
+        )}
+        {((isTextId(selected) && element) || selected === "arrow") && (
+          <DecorationProperties key={selected} document={d} id={selected as TextId | "arrow"} onChange={onChange} />
         )}
         {native && <LabelBackgroundProperties document={d} id={selected} onChange={onChange} />}
-        {selected !== "background" && limits && (
+        {selected !== "background" && limits && element && (
           <div className="dialkit-root control-stack position-controls" data-theme="light">
             <p className="field-label">Position</p>
             <Slider
               label="X"
-              value={d[selected].x}
+              value={element.x}
               min={limits.minX}
               max={limits.maxX}
               step={1}
-              onChange={(x) => onChange(moveElement(d, selected, x, d[selected].y))}
+              onChange={(x) => onChange(moveElement(d, selected, x, element.y))}
             />
             <Slider
               label="Y"
-              value={d[selected].y}
+              value={element.y}
               min={limits.minY}
               max={limits.maxY}
               step={1}
-              onChange={(y) => onChange(moveElement(d, selected, d[selected].x, y))}
+              onChange={(y) => onChange(moveElement(d, selected, element.x, y))}
             />
             {native && <p className="control-note">Finder icons stay upright at 128 px.</p>}
           </div>

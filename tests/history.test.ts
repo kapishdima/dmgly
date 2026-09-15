@@ -20,7 +20,7 @@ test("new edits clear redo; restoring draft resets history", () => {
   h = reduceHistory(h, { type: "undo" });
   h = reduceHistory(h, {
     type: "edit",
-    value: { ...h.present, text: { ...h.present.text, visible: false } },
+    value: { ...h.present, texts: [{ ...h.present.texts[0], visible: false }] },
   });
   expect(h.future).toEqual([]);
   h = reduceHistory(h, { type: "restore", value: createComposition() });

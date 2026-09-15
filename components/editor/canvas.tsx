@@ -12,6 +12,9 @@ import {
   Cursor01Icon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
+import { GifBackground } from "./gif-background";
+import { hasGifBackground } from "@/lib/dmgly/media";
+import { appIconBounds } from "@/lib/dmgly/app-icon";
 import { artworkSvg, textBounds } from "@/lib/dmgly/artwork";
 import { measureLabelWidths, type LabelWidths } from "@/lib/dmgly/label-metrics";
 import {
@@ -43,6 +46,7 @@ import {
   Composition,
   ElementId,
   MovableId,
+  getElement,
   NativeId,
   labelBackgroundBounds,
   moveLabelBackground,
@@ -56,6 +60,8 @@ export function DmgCanvas({
   onChange,
   onBegin,
   onEnd,
+  gifPaused = false,
+  onGifEnd = () => {},
 }: {
   document: Composition;
   selected: ElementId[];
@@ -63,6 +69,8 @@ export function DmgCanvas({
   onChange: (d: Composition) => void;
   onBegin?: () => void;
   onEnd?: () => void;
+  gifPaused?: boolean;
+  onGifEnd?: () => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const artboard = useRef<HTMLDivElement>(null);
@@ -82,9 +90,10 @@ export function DmgCanvas({
   const [transformFrame, setTransformFrame] = useState<SelectionFrame | null>(
     null,
   );
-  const [textFrame, setTextFrame] = useState<SelectionFrame | null>(null);
+  const [textFrames, setTextFrames] = useState<Record<string, SelectionFrame>>({});
   const ids = visibleElements(d).filter((id) => selected.includes(id));
-  const frame = transformFrame ?? selectionFrame(d, ids, textFrame);
+  const frame = transformFrame ?? selectionFrame(d, ids, textFrames);
+  const appIcon = d.app.image ? appIconBounds(d.app.image.width, d.app.image.height, 128) : null;
   const [available, setAvailable] = useState({ width: 660, height: 520 });
   const [zoom, setZoom] = useState<number | "fit">("fit");
   const [guides, setGuides] = useState<{ x?: number; y?: number }>({});
@@ -100,22 +109,18 @@ export function DmgCanvas({
     return () => observer.disconnect();
   }, []);
   useLayoutEffect(() => {
-    const text =
-      artboard.current?.querySelector<SVGTextElement>(".artwork text");
-    if (!text) return;
-    const box = text.getBBox();
-    const center = rotatePoint(
-      { x: box.x + box.width / 2, y: box.y + box.height / 2 },
-      d.text,
-      d.text.rotation,
-    );
-    setTextFrame({
-      ...center,
-      width: Math.max(16, box.width),
-      height: Math.max(24, box.height),
-      rotation: d.text.rotation,
-    });
-  }, [d.text]);
+    const nodes = artboard.current?.querySelectorAll<SVGTextElement>(".artwork text[data-text-id]");
+    if (!nodes) return;
+    const frames: Record<string, SelectionFrame> = {};
+    for (const node of nodes) {
+      const text = d.texts.find((text) => text.id === node.dataset.textId);
+      if (!text) continue;
+      const box = node.getBBox();
+      const center = rotatePoint({ x: box.x + box.width / 2, y: box.y + box.height / 2 }, text, text.rotation);
+      frames[text.id] = { ...center, width: Math.max(16, box.width), height: Math.max(24, box.height), rotation: text.rotation };
+    }
+    setTextFrames(frames);
+  }, [d.texts]);
   const canvasPadding = { top: 40, right: 24, bottom: 24, left: 44 };
   const scale =
     zoom === "fit"
@@ -165,8 +170,8 @@ export function DmgCanvas({
       ys = [(d.window.height - TITLEBAR_HEIGHT) / 2];
     for (const other of visibleElements(d)) {
       if (other !== id && !moving.includes(other)) {
-        xs.push(d[other].x);
-        ys.push(d[other].y);
+        xs.push(getElement(d, other).x);
+        ys.push(getElement(d, other).y);
       }
     }
     const gx = xs.find((v) => Math.abs(v - x) < 6 / scale);
@@ -198,7 +203,7 @@ export function DmgCanvas({
       ));
     } else if (start.kind === "move") {
       const id = start.ids[0],
-        origin = start.document[id];
+        origin = getElement(start.document, id);
       const destination = snap(
         id,
         start.ids,
@@ -325,7 +330,7 @@ export function DmgCanvas({
     label: string,
     native = false,
   ) {
-    const bounds = elementFrame(d, id, textFrame);
+    const bounds = elementFrame(d, id, textFrames);
     return (
       <button
         type="button"
@@ -359,7 +364,7 @@ export function DmgCanvas({
           );
           if (!moving.includes(id)) return;
           onBegin?.();
-          const bounds = selectionFrame(d, moving, textFrame)!;
+          const bounds = selectionFrame(d, moving, textFrames)!;
           drag.current = {
             kind: "move",
             ids: moving,
@@ -440,7 +445,7 @@ export function DmgCanvas({
               width={d.window.width}
               height={d.window.height}
               zoom={scale}
-              positions={ids.map((id) => d[id])}
+              positions={ids.map((id) => getElement(d, id))}
             />
             <div
               className="finder live-finder"
@@ -482,11 +487,13 @@ export function DmgCanvas({
                 style={{ height: d.window.height - TITLEBAR_HEIGHT }}
                 onClick={() => onSelectionChange(["background"])}
               >
-                <div className="artwork" dangerouslySetInnerHTML={{ __html: artworkSvg(d, labelWidths) }} />
+                {hasGifBackground(d) && <GifBackground key={d.background.image!.data.slice(0, 80) + d.background.image!.name} document={d} paused={gifPaused} onEnd={onGifEnd} />}
+                <div className="artwork" dangerouslySetInnerHTML={{ __html: artworkSvg(d, labelWidths, hasGifBackground(d)) }} />
                 {item(
                   "app",
                   <>
                     <img
+                      style={appIcon ? { width: appIcon.width, height: appIcon.height, borderRadius: appIcon.radius } : undefined}
                       src={
                         d.app.image?.data ?? "/assets/generic-application.png"
                       }
@@ -516,18 +523,13 @@ export function DmgCanvas({
                   "Applications folder",
                   true,
                 )}
-                {d.text.visible &&
+                {d.texts.filter((text) => text.visible).map((text, index) =>
                   item(
-                    "text",
-                    <span
-                      style={{
-                        display: "block",
-                        width: textFrame?.width ?? textBounds(d).width,
-                        height: textFrame?.height ?? textBounds(d).height,
-                      }}
-                    />,
-                    "Instruction text",
-                  )}
+                    text.id,
+                    <span style={{ display: "block", width: textFrames[text.id]?.width ?? textBounds(text).width, height: textFrames[text.id]?.height ?? textBounds(text).height }} />,
+                    `Text ${index + 1}: ${text.content.trim() || "Empty text"}`,
+                  )
+                )}
                 {d.arrow.visible &&
                   item(
                     "arrow",

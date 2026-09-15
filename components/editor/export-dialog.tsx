@@ -14,6 +14,7 @@ import { PlatformButtons } from "./platform-buttons";
 import { CodePreview } from "./code-preview";
 import { Dialog } from "@base-ui/react/dialog";
 import { Composition, compositionSchema } from "@/lib/dmgly/model";
+import { formatBytes, hasGifBackground } from "@/lib/dmgly/media";
 import { ExportTarget } from "@/lib/dmgly/export/contract";
 import {
   createBundle,
@@ -26,7 +27,12 @@ export function ExportDialog({ document: d }: { document: Composition }) {
     [tab, setTab] = useState<"config" | "prompt">("config"),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
+  const [readyFile, setReadyFile] = useState<{ url: string; name: string } | null>(null);
+  useEffect(() => () => { if (readyFile) URL.revokeObjectURL(readyFile.url); }, [readyFile]);
   const busyRef = useRef(false);
+  const controller = useRef<AbortController | null>(null);
+  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
+  useEffect(() => () => controller.current?.abort(), []);
   const copied =
     message === "Config copied." || message.startsWith("AI prompt copied.");
   useEffect(() => {
@@ -65,16 +71,22 @@ export function ExportDialog({ document: d }: { document: Composition }) {
     if (busyRef.current || error) return;
     busyRef.current = true;
     setBusy(true);
+    setProgress(null);
+    setReadyFile(null);
+    controller.current = new AbortController();
     setMessage("");
     try {
-      const bytes = await createBundle(d, target);
-      downloadBytes(bytes, `dmgly-${target}.zip`);
-      setMessage("ZIP downloaded. Your config, prompt, and assets are ready.");
+      const bytes = await createBundle(d, target, { signal: controller.current.signal, onProgress: (current, total) => setProgress({ current, total }) });
+      const name = `dmgly-${target}.zip`;
+      setReadyFile({ url: downloadBytes(bytes, name), name });
+      setMessage(`ZIP ready · ${formatBytes(bytes.byteLength)}.`);
     } catch (e) {
       setMessage(
-        e instanceof Error ? e.message : "Export failed. Please try again.",
+        e instanceof DOMException && e.name === "AbortError" ? "Export cancelled." : e instanceof Error ? e.message : "Export failed. Please try again.",
       );
     } finally {
+      controller.current = null;
+      setProgress(null);
       busyRef.current = false;
       setBusy(false);
     }
@@ -83,6 +95,7 @@ export function ExportDialog({ document: d }: { document: Composition }) {
     <Dialog.Root
       open={open}
       onOpenChange={(value) => {
+        if (!value) { controller.current?.abort(); setReadyFile(null); }
         setOpen(value);
         setMessage("");
       }}
@@ -122,6 +135,7 @@ export function ExportDialog({ document: d }: { document: Composition }) {
               disabled={busy}
               onChange={(value) => {
                 setTarget(value);
+                setReadyFile(null);
                 setMessage("");
               }}
             />
@@ -195,6 +209,7 @@ export function ExportDialog({ document: d }: { document: Composition }) {
                   ? "Run this script on macOS with your built .app and the exported assets."
                   : "Merge these settings into your app’s existing packaging configuration."}
             </p>
+            {hasGifBackground(d) && <p>Frame timing and repeats are preserved. Compositing may change colors and file size.</p>}
             {output?.config.warnings.map((w) => (
               <p key={w}>{w}</p>
             ))}
@@ -216,6 +231,7 @@ export function ExportDialog({ document: d }: { document: Composition }) {
               </span>
               {tab === "config" ? "Copy config" : "Copy AI prompt"}
             </button>
+            {busy && <button type="button" className="secondary-button" onClick={() => controller.current?.abort()}>Cancel</button>}
             <button
               type="button"
               className="primary-button"
@@ -226,9 +242,11 @@ export function ExportDialog({ document: d }: { document: Composition }) {
               {busy ? "Preparing files…" : "Download ZIP"}
             </button>
           </div>
-          <span className="sr-only" role="status">
-            {message}
-          </span>
+          {(busy || message) && <div className="export-progress" role="status">
+            {progress ? `Rendering GIF: ${progress.current} / ${progress.total} frames` : busy ? "Preparing files…" : message}
+            {readyFile && <a className="secondary-button" href={readyFile.url} download={readyFile.name}>Save ZIP</a>}
+            {progress && <progress aria-label="GIF export progress" value={progress.current} max={progress.total} />}
+          </div>}
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

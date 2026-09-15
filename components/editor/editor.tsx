@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   UndoIcon,
   RedoIcon,
@@ -8,6 +8,7 @@ import {
   GithubIcon,
   NewTwitterIcon,
   ReloadIcon,
+  TextIcon,
 } from "@hugeicons/core-free-icons";
 import { Icon } from "./icon";
 import { ExportDialog } from "./export-dialog";
@@ -17,7 +18,8 @@ import { DmgCanvas } from "./canvas";
 import { useDesignUrl } from "./use-design-url";
 import { useComposition } from "./use-composition";
 import { useInputModality } from "./use-input-modality";
-import { ElementId, createComposition } from "@/lib/dmgly/model";
+import { ElementId, createComposition, isTextId, getText, addText } from "@/lib/dmgly/model";
+import { hasGifBackground } from "@/lib/dmgly/media";
 import { selectElement } from "@/lib/dmgly/transforms";
 import "./editor.css";
 
@@ -36,7 +38,15 @@ export default function Editor() {
   } = useComposition();
   const designUrl = useDesignUrl(document, restore);
   const [selection, setSelection] = useState<ElementId[]>(["background"]);
-  const selected = selection[selection.length - 1] ?? "background";
+  const [gifPaused, setGifPaused] = useState(false);
+  useEffect(() => {
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setGifPaused(motion.matches);
+    update(); motion.addEventListener("change", update);
+    return () => motion.removeEventListener("change", update);
+  }, []);
+  const requested = selection[selection.length - 1] ?? "background";
+  const selected = isTextId(requested) && !getText(document, requested) ? document.texts[0]?.id ?? "text" : requested;
   const select = (id: ElementId, additive = false) =>
     setSelection((current) => selectElement(current, id, additive));
   return (
@@ -91,6 +101,24 @@ export default function Editor() {
                 role="group"
                 aria-label="Preview actions"
               >
+                {hasGifBackground(document) && <button type="button" className="toolbar-button" aria-pressed={!gifPaused} onClick={() => setGifPaused(!gifPaused)}>
+                  {gifPaused ? "Play GIF" : "Pause GIF"}
+                </button>}
+                <button
+                  type="button"
+                  className="toolbar-button"
+                  aria-label="Add text"
+                  title="Add text"
+                  onClick={() => {
+                    end();
+                    const next = addText(document);
+                    setDocument(next.document);
+                    setSelection([next.id]);
+                  }}
+                >
+                  <Icon icon={TextIcon} />
+                  <span className="history-label">Text</span>
+                </button>
                 <button
                   type="button"
                   className="toolbar-button"
@@ -133,6 +161,8 @@ export default function Editor() {
               </div>
             </div>
             <DmgCanvas
+              gifPaused={gifPaused}
+              onGifEnd={() => setGifPaused(true)}
               document={document}
               selected={selection}
               onSelectionChange={setSelection}

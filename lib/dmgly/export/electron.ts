@@ -1,10 +1,11 @@
+import { backgroundAssetPath } from "../media";
 import { Composition, snapshot } from "../model";
 import { assetPaths, commonInstructions, ExportConfig, iconInstructions } from "./contract";
 export function electronConfig(document: Composition): ExportConfig {
   const d = snapshot(document);
   const config = {
     dmg: {
-      background: "build/dmgly/assets/dmg-background.png",
+      background: `build/dmgly/${backgroundAssetPath(d)}`,
       window: { width: d.window.width, height: d.window.height },
       iconSize: 128,
       contents: [

@@ -6,6 +6,10 @@ import {
   ICON_SIZE,
   MovableId,
   movementLimits,
+  getElement,
+  getText,
+  isTextId,
+  updateElement,
   TITLEBAR_HEIGHT,
 } from "./model";
 
@@ -17,9 +21,7 @@ export type SelectionFrame = Point & {
 };
 
 export function visibleElements(d: Composition): MovableId[] {
-  return (["app", "applications", "text", "arrow"] as const).filter(
-    (id) => !("visible" in d[id]) || d[id].visible,
-  );
+  return ["app", "applications", ...d.texts.filter((text) => text.visible).map((text) => text.id), ...(d.arrow.visible ? ["arrow" as const] : [])];
 }
 
 export function selectElement(
@@ -51,12 +53,12 @@ export function rotatePoint(
 export function elementFrame(
   d: Composition,
   id: MovableId,
-  textFrame?: SelectionFrame | null,
+  textFrames?: Record<string, SelectionFrame>,
 ): SelectionFrame {
-  if (id === "text" && textFrame) return textFrame;
+  if (isTextId(id) && textFrames?.[id]) return textFrames[id];
   const bounds =
-    id === "text"
-      ? textBounds(d)
+    isTextId(id)
+      ? textBounds(getText(d, id)!)
       : id === "arrow"
         ? {
             width: (d.arrow.width + 20) * d.arrow.scale,
@@ -65,21 +67,21 @@ export function elementFrame(
         : { width: ICON_SIZE, height: ICON_SIZE };
   return {
     ...bounds,
-    x: d[id].x,
-    y: d[id].y,
-    rotation: id === "text" || id === "arrow" ? d[id].rotation : 0,
+    x: getElement(d, id).x,
+    y: getElement(d, id).y,
+    rotation: isTextId(id) ? getText(d, id)!.rotation : id === "arrow" ? d.arrow.rotation : 0,
   };
 }
 
 export function selectionFrame(
   d: Composition,
   ids: MovableId[],
-  textFrame?: SelectionFrame | null,
+  textFrames?: Record<string, SelectionFrame>,
 ): SelectionFrame | null {
   if (!ids.length) return null;
-  if (ids.length === 1) return elementFrame(d, ids[0], textFrame);
+  if (ids.length === 1) return elementFrame(d, ids[0], textFrames);
   const points = ids.flatMap((id) => {
-    const frame = elementFrame(d, id, textFrame);
+    const frame = elementFrame(d, id, textFrames);
     return [-1, 1].flatMap((x) =>
       [-1, 1].map((y) =>
         rotatePoint(
@@ -119,32 +121,32 @@ export function moveSelection(
     maxY = Infinity;
   for (const id of ids) {
     const limits = movementLimits(d, id);
-    minX = Math.max(minX, limits.minX - d[id].x);
-    maxX = Math.min(maxX, limits.maxX - d[id].x);
-    minY = Math.max(minY, limits.minY - d[id].y);
-    maxY = Math.min(maxY, limits.maxY - d[id].y);
+    minX = Math.max(minX, limits.minX - getElement(d, id).x);
+    maxX = Math.min(maxX, limits.maxX - getElement(d, id).x);
+    minY = Math.max(minY, limits.minY - getElement(d, id).y);
+    maxY = Math.min(maxY, limits.maxY - getElement(d, id).y);
   }
   const x = Math.round(clamp(dx, Math.min(0, minX), Math.max(0, maxX)));
   const y = Math.round(clamp(dy, Math.min(0, minY), Math.max(0, maxY)));
   if (x === 0 && y === 0) return d;
-  const next = { ...d };
+  let next = d;
   for (const id of ids)
-    Object.assign(next, { [id]: { ...d[id], x: d[id].x + x, y: d[id].y + y } });
+    next = updateElement(next, id, { x: getElement(d, id).x + x, y: getElement(d, id).y + y });
   return next;
 }
 
 export function canTransform(ids: MovableId[]) {
-  return ids.length > 0 && ids.every((id) => id === "text" || id === "arrow");
+  return ids.length > 0 && ids.every((id) => isTextId(id) || id === "arrow");
 }
 const normalizedAngle = (degrees: number) =>
   ((((degrees + 180) % 360) + 360) % 360) - 180;
 const centersFit = (d: Composition, ids: MovableId[]) =>
   ids.every(
     (id) =>
-      d[id].x >= 0 &&
-      d[id].x <= d.window.width &&
-      d[id].y >= 0 &&
-      d[id].y <= d.window.height - TITLEBAR_HEIGHT,
+      getElement(d, id).x >= 0 &&
+      getElement(d, id).x <= d.window.width &&
+      getElement(d, id).y >= 0 &&
+      getElement(d, id).y <= d.window.height - TITLEBAR_HEIGHT,
   );
 
 export function rotateSelection(
@@ -155,15 +157,13 @@ export function rotateSelection(
 ): Composition {
   if (!canTransform(ids) || !Number.isFinite(degrees) || degrees === 0)
     return d;
-  const next = { ...d };
+  let next = d;
   for (const id of ids) {
-    if (id !== "text" && id !== "arrow") continue;
-    Object.assign(next, {
-      [id]: {
-        ...d[id],
-        ...rotatePoint(d[id], center, degrees),
-        rotation: normalizedAngle(d[id].rotation + degrees),
-      },
+    if (!isTextId(id) && id !== "arrow") continue;
+    const element = isTextId(id) ? getText(d, id)! : d.arrow;
+    next = updateElement(next, id, {
+      ...rotatePoint(element, center, degrees),
+      rotation: normalizedAngle(element.rotation + degrees),
     });
   }
   return centersFit(next, ids) ? next : d;
@@ -179,16 +179,16 @@ export function scaleSelection(
   let min = 0,
     max = Infinity;
   for (const id of ids) {
-    if (id === "text") {
-      min = Math.max(min, 12 / d.text.size);
-      max = Math.min(max, 64 / d.text.size);
+    if (isTextId(id)) {
+      min = Math.max(min, 12 / getText(d, id)!.size);
+      max = Math.min(max, 64 / getText(d, id)!.size);
     }
     if (id === "arrow") {
       min = Math.max(min, 0.25 / d.arrow.scale);
       max = Math.min(max, 4 / d.arrow.scale);
     }
     for (const axis of ["x", "y"] as const) {
-      const offset = d[id][axis] - anchor[axis];
+      const offset = getElement(d, id)[axis] - anchor[axis];
       if (offset === 0) continue;
       const limit =
         axis === "x" ? d.window.width : d.window.height - TITLEBAR_HEIGHT;
@@ -201,21 +201,18 @@ export function scaleSelection(
   if (min > max) return d;
   const ratio = clamp(factor, min, max);
   if (ratio === 1) return d;
-  const next = { ...d };
+  let next = d;
   for (const id of ids) {
-    if (id !== "text" && id !== "arrow") continue;
+    if (!isTextId(id) && id !== "arrow") continue;
     const position = {
-      x: anchor.x + (d[id].x - anchor.x) * ratio,
-      y: anchor.y + (d[id].y - anchor.y) * ratio,
+      x: anchor.x + (getElement(d, id).x - anchor.x) * ratio,
+      y: anchor.y + (getElement(d, id).y - anchor.y) * ratio,
     };
-    Object.assign(next, {
-      [id]: {
-        ...d[id],
-        ...position,
-        ...(id === "text"
-          ? { size: d.text.size * ratio }
-          : { scale: d.arrow.scale * ratio }),
-      },
+    next = updateElement(next, id, {
+      ...position,
+      ...(isTextId(id)
+        ? { size: getText(d, id)!.size * ratio }
+        : { scale: d.arrow.scale * ratio }),
     });
   }
   return centersFit(next, ids) ? next : d;
